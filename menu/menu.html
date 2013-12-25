@@ -1,0 +1,15 @@
+<template name="ognoAdminMenu">
+    <div id="ognoAdminMenu" class="ui large tiered fixed inverted vertical main menu">
+        <div class="menu">
+            {{#each mainItem}}
+            <{{tag}} href="{{url}}" class="{{isActive}} header main item">
+                <i class="{{icon}} icon"></i>
+                {{title}}
+            </{{tag}}>
+                {{#each subItem}}
+                <a href="{{subUrl}}" class="{{isActive}} item">{{title}}</a>
+                {{/each}}
+            {{/each}}
+        </div>
+    </div>
+</template>
