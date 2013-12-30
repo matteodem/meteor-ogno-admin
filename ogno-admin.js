@@ -97,9 +97,7 @@ OgnoAdmin = (function () {
             });
         }
 
-        // TODO: instead of using collection._config, make a helper for getting the structure config!
-        // TODO: Make config property on structure possible with EasyCheck Objects
-        // TODO: Use EasyCheck.helpers.getEasyCheckConfig()
+        // TODO: Custom Templates
     }
 
     return {
@@ -121,7 +119,7 @@ OgnoAdmin = (function () {
         'isAllowed' : function () {
             return config.isAllowed();
         },
-        'getCollectionBySession' : function (p) {
+        'getCollection' : function (p) {
             return collections[p.reference] ? collections[p.reference] : {};
         }
     };

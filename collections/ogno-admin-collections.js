@@ -2,8 +2,12 @@
     var pagination;
 
     function getCollection() {
-        var c = OgnoAdmin.getCollectionBySession(Session.get('currentCollection').type);
+        var c = OgnoAdmin.getCollection(Session.get('currentCollection').type);
         return "object" === typeof c ? c : {};
+    }
+
+    function getConfig() {
+        return Session.get('currentCollection').config;
     }
 
     function printValue(val, config) {
@@ -39,10 +43,10 @@
         },
         'value' : function (doc) {
             var array = [],
-                collection = getCollection();
+                config = getConfig();
 
             _.each(_.keys(getCollection().findOne()), function (val) {
-                array.push(printValue(doc[val], collection._config[val]));
+                array.push(printValue(doc[val], config[val]));
             });
 
             return array;
@@ -68,7 +72,7 @@
 
     Template.ognoAdminEditForm.helpers({
         'formField' : function () {
-            var config = getCollection()._config;
+            var config = getConfig();
 
             return _.map(_.keys(config), function (key) {
                 return _.extend(config[key], { 'key' : key });
@@ -119,10 +123,11 @@
         'click .save' : function () {
             var values = {},
                 collection = getCollection(),
-                configKeys = _.keys(collection._config);
+                config = getConfig(),
+                configKeys = _.keys(config);
 
             $('#ognoAdminEditForm input').each(function (i) {
-                var type = collection._config[configKeys[i]].type;
+                var type = config[configKeys[i]].type;
                 values[configKeys[i]] = OgnoAdmin.typeFactory.get(type).getDocumentValue($(this));
             });
 
