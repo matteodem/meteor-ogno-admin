@@ -5,5 +5,9 @@
   "author": "",
   "version": "0.0.1",
   "git": "",
-  "packages": {}
+  "packages": {
+    "iron-router" : {},
+    "semantic-ui" : {},
+    "pagination-mini" : {}
+  }
 }

@@ -1,7 +1,50 @@
 <template name="ognoAdminCollectionsView">
-    <table class="ui table segment">
+    {{#if hasMoreItems}}
+    {{{pager}}}
+    {{/if}}
+    <table class="ui table">
+    <thead>
+        <tr>
+            {{#each headerValue}}
+                <th>{{this}}</th>
+            {{/each}}
+            <th>Actions</th>
+        </tr>
+    </thead>
     {{#each entry}}
-        <tr>{{print this}}</tr>
+        <tr class="{{isActive}}">
+            {{#each value this}}
+            <td>{{this}}</td>
+            {{/each}}
+            <td>
+                <div class="ui basic edit-document button" collection-id="{{_id}}">Edit</div>
+            </td>
+        </tr>
     {{/each}}
     </table>
+    {{#if hasMoreItems}}
+    {{{pager}}}
+    {{/if}}
+
+    <div class="ui purple add-document button"><i class="add icon"></i>Add</div>
+    {{#if editMode}}
+        {{> ognoAdminEditForm}}
+    {{/if}}
+</template>
+
+<template name="ognoAdminEditForm">
+    <form id="ognoAdminEditForm" class="ui form">
+        <!-- Use easy-template later -->
+        {{#each formField}}
+        <div class="field">
+            <label>{{key}}</label>
+            <input type="{{inputType}}" value="{{inputValue}}" />
+        </div>
+        {{/each}}
+        {{#if isNotNew}}
+        <div class="ui remove red button">{{removeText}}</div>
+        {{else}}
+        <div class="ui save positive button">Save</div>
+        {{/if}}
+    </form>
 </template>

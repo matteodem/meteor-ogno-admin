@@ -51,34 +51,39 @@ OgnoAdmin = (function () {
         return s;
     }
 
-    Router.map(function () {
-        var routerConfig = function (path, o) {
-            return _.extend({
-                'layoutTemplate' : 'ognoAdminLayout',
-                'template' : 'ognoAdminMainView',
-                'path' : config.prefix + path,
-                'data' : function () {
-                    var data = {},
-                        s = getStructureWithParameters(this.params);
+    function init() {
+        Router.map(function () {
+            var routerConfig = function (path, o) {
+                var defaultConf = {
+                    'layoutTemplate' : 'ognoAdminLayout',
+                    'template' : 'ognoAdminMainView',
+                    'path' : config.prefix + path,
+                    'load' : function () {
+                        Session.set('selectedDocument', null);
+                        Session.set('currentCollection', null);
+                    },
+                    'data' : function () {
+                        var data = {},
+                            s = getStructureWithParameters(this.params);
 
-                    if (s && _.isObject(s.type) && "collections" === s.type.view) {
-                        Session.set('currentCollection', s);
-                        data['content'] = Template['ognoAdminCollectionsView']();
+                        if (s && _.isObject(s.type) && "collections" === s.type.view) {
+                            Session.set('currentCollection', s);
+                        }
+
+                        return data;
                     }
+                };
 
-                    return data;
-                }
-            }, o);
-        };
+                return _.extend(defaultConf, o);
+            };
 
-        this.route('ognoAdminIndex', routerConfig('', { 'template' : 'ognoAdminOverview' })); // TODO: Make template / text possible for structure
-        this.route('ognoAdminMainPage', routerConfig('/:id'));
-        this.route('ognoAdminSubPage', routerConfig('/:pid/:id'));
-    });
+            this.route('ognoAdminIndex', routerConfig('', { 'template' : 'ognoAdminOverview' }));
+            this.route('ognoAdminMainPage', routerConfig('/:id'));
+            this.route('ognoAdminSubPage', routerConfig('/:pid/:id'));
+        });
 
-    // TODO: collection view
-    // TODO: Permissions with meteor roles
-    // TODO: make zero configurations possible with top level collections
+        // TODO: Permissions with meteor roles
+    }
 
     return {
         'config' : function (c) {
@@ -87,6 +92,7 @@ OgnoAdmin = (function () {
             }
 
             config = _.extend(config, c);
+            init();
         },
         'structure' : function (s) {
             if ("undefined" === typeof s) {
