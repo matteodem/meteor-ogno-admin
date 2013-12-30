@@ -2,12 +2,12 @@
     var pagination;
 
     function getCollection() {
-        var c = OgnoAdmin.getCollection(Session.get('currentCollection').type);
+        var c = OgnoAdmin.getCollection(Session.get('ognoAdminCurrentView').type);
         return "object" === typeof c ? c : {};
     }
 
     function getConfig() {
-        return Session.get('currentCollection').config;
+        return Session.get('ognoAdminCurrentView').config;
     }
 
     function printValue(val, config) {

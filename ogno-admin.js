@@ -27,6 +27,9 @@ OgnoAdmin = (function () {
                 collections[e.type._name] = collection = e.type;
                 e.type = { 'view' : 'collections', 'reference' :  e.type._name };
                 e.config = _.isObject(collection._config) ? collection._config : e.config;
+            } else if (_.isString(e.type)) {
+                // is a custom template
+                e.type = { 'view' : e.type };
             }
 
             return _.extend(e, { 'slug' : slugify(e.title) });
@@ -69,14 +72,14 @@ OgnoAdmin = (function () {
                     'path' : config.prefix + path,
                     'load' : function () {
                         Session.set('selectedDocument', null);
-                        Session.set('currentCollection', null);
+                        Session.set('ognoAdminCurrentView', null);
                     },
                     'data' : function () {
                         var data = {},
                             s = getStructureWithParameters(this.params);
 
-                        if (s && _.isObject(s.type) && "collections" === s.type.view) {
-                            Session.set('currentCollection', s);
+                        if (s && _.isObject(s.type)) {
+                            Session.set('ognoAdminCurrentView', s);
                         }
 
                         return data;
@@ -97,7 +100,8 @@ OgnoAdmin = (function () {
             });
         }
 
-        // TODO: Custom Templates
+        // TODO: make "siteTitle", definable for the <h1>header</h1>
+        // TODO: Better API for Structure, kinda confusing right now
     }
 
     return {

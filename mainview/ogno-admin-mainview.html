@@ -1,9 +1,11 @@
 <template name="ognoAdminMainView">
     {{#if canView}}
         {{#if isCollectionView}}
+            <h1 class="ui large header">{{siteTitle}}</h1>
             {{> ognoAdminCollectionsView}}
         {{else}}
-            <div>Other Content</div>
+            <!-- Custom template -->
+            {{{customTemplateContents}}}
         {{/if}}
     {{else}}
     <div class="ui error message">
