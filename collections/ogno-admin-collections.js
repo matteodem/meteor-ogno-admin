@@ -7,24 +7,11 @@
     }
 
     function printValue(val, config) {
-        var jsonString;
-
-        if (config) {
-            // do config stuff
-        }
-
-        // TODO: Remove this if
-        if (_.isString(val)) {
+        if (!config) {
             return val;
         }
 
-        jsonString = JSON.stringify(val);
-
-        if (_.isString(jsonString) && jsonString.length > 20) {
-            return jsonString.slice(0, 20) + '...';
-        }
-
-        return jsonString;
+        return OgnoAdmin.typeFactory.get(config.type).printValue(val);
     }
 
     Template.ognoAdminCollectionsView.helpers({
@@ -55,7 +42,7 @@
                 collection = getCollection();
 
             _.each(_.keys(getCollection().findOne()), function (val) {
-                array.push(printValue(doc[val], collection._config));
+                array.push(printValue(doc[val], collection._config[val]));
             });
 
             return array;
@@ -88,31 +75,23 @@
             });
         },
         'inputType' : function () {
-            var type = "";
-
-            switch (this.type) {
-                default:
-                    type = 'text';
-                    break;
-            }
-
-            return type;
+            return OgnoAdmin.typeFactory.get(this.type).inputType;
         },
-        'inputValue' : function () {
-            var value,
+        'inputAttributes' : function () {
+            var attributes = "",
                 doc = getCollection().findOne(Session.get('selectedDocument'));
 
             if (!_.isObject(doc)) {
                 return '';
             }
 
-            value = doc[this.key];
-
-            if (_.isString(value)) {
-                return value;
+            if (this.required) {
+                attributes += ' required="required" ';
             }
 
-            return JSON.stringify(value);
+            attributes += OgnoAdmin.typeFactory.get(this.type).getInputValue(doc[this.key]);
+
+            return attributes;
         },
         'isNotNew' : function () {
             return Session.get('selectedDocument') !== 'new';
@@ -139,26 +118,35 @@
         },
         'click .save' : function () {
             var values = {},
-                configKeys = _.keys(getCollection()._config);
+                collection = getCollection(),
+                configKeys = _.keys(collection._config);
 
             $('#ognoAdminEditForm input').each(function (i) {
-                values[configKeys[i]] = $(this).val();
+                var type = collection._config[configKeys[i]].type;
+                values[configKeys[i]] = OgnoAdmin.typeFactory.get(type).getDocumentValue($(this));
             });
 
-            getCollection().insert(values);
-            Session.set('selectedDocument', null);
-        },
-        'blur #ognoAdminEditForm input' : function (e) {
-            var newValue = {},
-                formValue = $(e.target).val();
-
-            try {
-                newValue[this.key] = JSON.parse(formValue);
-            } catch (e) {
-                newValue[this.key] = formValue;
+            if (_.isFunction(collection.easyInsert)) {
+                collection.easyInsert(values);
+            } else {
+                collection.insert(values);
             }
 
-            getCollection().update(Session.get('selectedDocument'), { $set : newValue });
+            Session.set('selectedDocument', null);
+        },
+        'blur #ognoAdminEditForm input, click #ognoAdminEditForm input[type="checkbox"]' : function (e) {
+            var newValue = OgnoAdmin.typeFactory.get(this.type).getDocumentValue($(e.target)),
+                collection = getCollection(),
+                updatedPartialDoc = {};
+
+            updatedPartialDoc[this.key] = newValue;
+
+            if (_.isFunction(collection.easyUpdate)) {
+                collection.easyUpdate(Session.get('selectedDocument'), { '$set' : updatedPartialDoc });
+                return;
+            }
+
+            collection.update(Session.get('selectedDocument'), { '$set' : updatedPartialDoc });
         }
     });
 })();

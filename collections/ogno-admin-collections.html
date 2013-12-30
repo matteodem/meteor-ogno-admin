@@ -14,7 +14,7 @@
     {{#each entry}}
         <tr class="{{isActive}}">
             {{#each value this}}
-            <td>{{this}}</td>
+            <td>{{{this}}}</td>
             {{/each}}
             <td>
                 <div class="ui basic edit-document button" collection-id="{{_id}}">Edit</div>
@@ -38,7 +38,7 @@
         {{#each formField}}
         <div class="field">
             <label>{{key}}</label>
-            <input type="{{inputType}}" value="{{inputValue}}" />
+            <input type="{{inputType}}" {{{inputAttributes}}} />
         </div>
         {{/each}}
         {{#if isNotNew}}

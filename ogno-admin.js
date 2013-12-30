@@ -17,12 +17,16 @@ OgnoAdmin = (function () {
 
     function setUpStructure(s, isRoot) {
         var fullStructure = _.map(s, function (e) {
+            var collection;
+
             if (_.isArray(e.type)) {
+                // is a sub menu tree
                 e.type = setUpStructure(e.type);
             } else if (e.type instanceof Meteor.Collection) {
-                // type identifier
-                collections[e.type._name] = e.type;
+                // is a collection view
+                collections[e.type._name] = collection = e.type;
                 e.type = { 'view' : 'collections', 'reference' :  e.type._name };
+                e.config = _.isObject(collection._config) ? collection._config : e.config;
             }
 
             return _.extend(e, { 'slug' : slugify(e.title) });
@@ -93,7 +97,7 @@ OgnoAdmin = (function () {
             });
         }
 
-        // TODO: Use EasyCheck for displaying the form / data
+        // TODO: instead of using collection._config, make a helper for getting the structure config!
         // TODO: Make config property on structure possible with EasyCheck Objects
         // TODO: Use EasyCheck.helpers.getEasyCheckConfig()
     }

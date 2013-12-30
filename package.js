@@ -13,7 +13,8 @@ Package.on_use(function (api, where) {
 
     // Collection view
     api.add_files(
-        ['collections/ogno-admin-collections.html', 'collections/ogno-admin-collections.js', 'collections/ogno-admin-collections.less'],
+        ['collections/ogno-admin-collections.html', 'collections/ogno-admin-collections.js',
+            'collections/ogno-admin-collections.less', 'collections/ogno-admin-types.js'],
         'client'
     );
 
