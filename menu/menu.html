@@ -1,4 +1,5 @@
 <template name="ognoAdminMenu">
+    {{#if canView}}
     <div id="ognoAdminMenu" class="ui tiered fixed inverted vertical main menu">
         <div class="menu">
             {{#each mainItem}}
@@ -12,4 +13,5 @@
             {{/each}}
         </div>
     </div>
+    {{/if}}
 </template>

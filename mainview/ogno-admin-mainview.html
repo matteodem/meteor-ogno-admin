@@ -1,8 +1,13 @@
 <template name="ognoAdminMainView">
-    <!-- TODO: Check for other views -->
-    {{#if isCollectionView}}
-    {{> ognoAdminCollectionsView}}
+    {{#if canView}}
+        {{#if isCollectionView}}
+            {{> ognoAdminCollectionsView}}
+        {{else}}
+            <div>Other Content</div>
+        {{/if}}
     {{else}}
-    <div>Other Content</div>
+    <div class="ui error message">
+    <div class="header">Not enough permissions</div>
+    </div>
     {{/if}}
 </template>

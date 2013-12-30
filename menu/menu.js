@@ -19,5 +19,8 @@ Template.ognoAdminMenu.helpers({
     },
     'subUrl' : function () {
         return Router.routes['ognoAdminSubPage'].path({ 'id' : this.slug, 'pid' : this.parent });
+    },
+    'canView' : function () {
+        return OgnoAdmin.isAllowed();
     }
 });

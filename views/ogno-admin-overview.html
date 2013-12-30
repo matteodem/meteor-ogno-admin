@@ -1,4 +1,5 @@
 <template name="ognoAdminOverview">
+    {{#if canView}}
     <h1 class="ui large header">Welcome to Ogno Admin</h1>
     <p>This admin UI has been made with lots of love and tries to make creating Admin Interfaces as easy as possible.</p>
     <h2 class="ui small header">Features</h2>
@@ -11,4 +12,9 @@
         <i class="circular heart icon"></i>
     </div>
     <a href="/" class="ui button"><i class="close icon"></i>Go back</a>
+    {{else}}
+    <div class="ui error message">
+        <div class="header">Not enough permissions</div>
+    </div>
+    {{/if}}
 </template>

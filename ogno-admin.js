@@ -1,7 +1,12 @@
 OgnoAdmin = (function () {
     var structure = [{ 'title' : 'Dashboard', 'icon' : 'dashboard', 'slug' : '' }],
         collections = {},
-        config = { 'prefix' : '/ogno-admin'};
+        config = {
+            'prefix' : '/ogno-admin',
+            'isAllowed' : function () {
+                return Meteor.user();
+            }
+        };
 
     function slugify(Text)
     {
@@ -82,7 +87,15 @@ OgnoAdmin = (function () {
             this.route('ognoAdminSubPage', routerConfig('/:pid/:id'));
         });
 
-        // TODO: Permissions with meteor roles
+        if (Meteor.isClient) {
+            Handlebars.registerHelper('canView', function () {
+                return OgnoAdmin.isAllowed();
+            });
+        }
+
+        // TODO: Use EasyCheck for displaying the form / data
+        // TODO: Make config property on structure possible with EasyCheck Objects
+        // TODO: Use EasyCheck.helpers.getEasyCheckConfig()
     }
 
     return {
@@ -100,6 +113,9 @@ OgnoAdmin = (function () {
             }
 
             structure = setUpStructure(s, true);
+        },
+        'isAllowed' : function () {
+            return config.isAllowed();
         },
         'getCollectionBySession' : function (p) {
             return collections[p.reference] ? collections[p.reference] : {};
