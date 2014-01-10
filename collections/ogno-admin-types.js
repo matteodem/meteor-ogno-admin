@@ -18,7 +18,8 @@ OgnoAdmin.typeFactory.types = {
             return val;
         },
         'getInputValue' : function (val) {
-            return 'value="' + new Handlebars.SafeString(val) + '"';
+            var string = "string" === typeof val ? new Handlebars.SafeString(val) : '';
+            return 'value="' + string + '"';
         },
         'getDocumentValue' : function (el) {
             return el.val();

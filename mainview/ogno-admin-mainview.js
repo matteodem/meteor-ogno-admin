@@ -7,7 +7,8 @@ Template.ognoAdminMainView.helpers({
         return OgnoAdmin.isAllowed();
     },
     'siteTitle' : function () {
-        return Session.get('ognoAdminCurrentView').title;
+        var session = Session.get('ognoAdminCurrentView');
+        return "string"  === typeof session['site-title'] ? session['site-title'] : session['menu-title'];
     },
     'customTemplateContents' : function () {
         var view = Session.get('ognoAdminCurrentView');

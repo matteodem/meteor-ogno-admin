@@ -33,18 +33,24 @@
 </template>
 
 <template name="ognoAdminEditForm">
-    <form id="ognoAdminEditForm" class="ui form">
+    {{#autoForm schema=documentForm doc=selectedDoc id="ognoAdminEditForm"}}
+    <div class="ui form">
         <!-- Use easy-template later -->
         {{#each formField}}
         <div class="field">
-            <label>{{key}}</label>
-            <input type="{{inputType}}" {{{inputAttributes}}} />
+            {{#if afFieldIsInvalid field autoform=../this}}
+                <div class="ui error message">
+                    {{afFieldMessage field autoform=../../this}}
+                </div>
+            {{/if}}
+            <label>{{afFieldLabel field autoform=../this}}</label>
+            {{afFieldInput field autoform=../this class=additionalClasses }}
         </div>
         {{/each}}
         {{#if isNotNew}}
-        <div class="ui remove red button">{{removeText}}</div>
-        {{else}}
-        <div class="ui save positive button">Save</div>
+        <button type="submit" class="ui {{removeClass}} removable red button">{{removeText}}</button>
         {{/if}}
-    </form>
+        <button type="submit" class="ui save {{operationClass}} positive button">Save</button>
+    </div>
+    {{/autoForm}}
 </template>

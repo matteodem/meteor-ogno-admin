@@ -1,5 +1,5 @@
 OgnoAdmin = (function () {
-    var structure = [{ 'title' : 'Dashboard', 'icon' : 'dashboard', 'slug' : '' }],
+    var structure = [{ 'menu-title' : 'Dashboard', 'icon' : 'dashboard', 'slug' : '', 'weight' : '1' }],
         collections = {},
         config = {
             'prefix' : '/ogno-admin',
@@ -19,25 +19,42 @@ OgnoAdmin = (function () {
         var fullStructure = _.map(s, function (e) {
             var collection;
 
-            if (_.isArray(e.type)) {
+            if ("tree" === e.type) {
                 // is a sub menu tree
-                e.type = setUpStructure(e.type);
-            } else if (e.type instanceof Meteor.Collection) {
+                e.type = setUpStructure(e.use);
+            } else if ("collection" === e.type) {
+                var sessionConfig = {};
+
                 // is a collection view
-                collections[e.type._name] = collection = e.type;
-                e.type = { 'view' : 'collections', 'reference' :  e.type._name };
-                e.config = _.isObject(collection._config) ? collection._config : e.config;
-            } else if (_.isString(e.type)) {
+                collections[e.use._name] = collection = e.use;
+                e.type = { 'view' : 'collections', 'reference' :  e.use._name };
+
+                _.each(collection.simpleSchema()._schema, function (value, key) {
+                    sessionConfig[key] = _.extend(_.clone(value), {
+                        type : value.type.toString().split(/[\w]()/g)[1]
+                    });
+                });
+
+                e.config = sessionConfig;
+            } else if ("custom" === e.type) {
                 // is a custom template
-                e.type = { 'view' : e.type };
+                e.type = { 'view' : e.use };
             }
 
-            return _.extend(e, { 'slug' : slugify(e.title) });
+            delete e.use;
+
+            return _.extend(e, { 'slug' : slugify(e['menu-title']) });
         });
 
         if (isRoot) {
-            // unite the structure before with the new one
-            fullStructure = _.union(structure, fullStructure);
+            fullStructure = _.sortBy(
+                // unite the structure before with the new one
+                _.union(structure, fullStructure),
+                // sort by defined weight
+                function(doc) {
+                    return doc.weight
+                }
+            );
         }
 
         if (Meteor.isClient) {
@@ -98,10 +115,20 @@ OgnoAdmin = (function () {
             Handlebars.registerHelper('canView', function () {
                 return OgnoAdmin.isAllowed();
             });
+
+            Template.ognoAdminOverview.helpers({
+                'customizedHomeScreen' : function () {
+                    return config.homeScreenTemplate;
+                },
+                'customHomeScreenContent' : function () {
+                    return Template[config.homeScreenTemplate]();
+                }
+            });
         }
 
-        // TODO: make "siteTitle", definable for the <h1>header</h1>
-        // TODO: Better API for Structure, kinda confusing right now
+        // TODO:
+        // TODO: Images, filepicker
+        // TODO: Arrays, select2
     }
 
     return {

@@ -8,7 +8,7 @@ Template.ognoAdminMenu.helpers({
         return this.slug === Router.current().params.id ? 'active' : 'not-active';
     },
     'tag' : function () {
-        return this.noLink ? 'div' : 'a';
+        return this.noLink || _.isArray(this.type) ? 'div' : 'a';
     },
     'url' : function () {
         return Router.routes['ognoAdminMainPage'].path({ 'id' : this.slug });

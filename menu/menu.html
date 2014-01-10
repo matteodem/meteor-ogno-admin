@@ -5,10 +5,10 @@
             {{#each mainItem}}
             <{{tag}} href="{{url}}" class="{{isActive}} header main item">
                 <i class="{{icon}} icon"></i>
-                {{title}}
+                {{menu-title}}
             </{{tag}}>
                 {{#each subItem}}
-                <a href="{{subUrl}}" class="{{isActive}} item">{{title}}</a>
+                <a href="{{subUrl}}" class="{{isActive}} item">{{menu-title}}</a>
                 {{/each}}
             {{/each}}
         </div>

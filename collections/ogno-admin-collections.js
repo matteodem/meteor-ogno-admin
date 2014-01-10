@@ -1,5 +1,6 @@
 (function () {
-    var pagination;
+    var pagination,
+        documentForm;
 
     function getCollection() {
         var c = OgnoAdmin.getCollection(Session.get('ognoAdminCurrentView').type);
@@ -70,35 +71,54 @@
         pagination.destroy();
     };
 
+    Template.ognoAdminEditForm.created = function () {
+        documentForm = new AutoForm(getCollection().simpleSchema());
+    };
+
+    Template.ognoAdminEditForm.rendered = function () {
+        documentForm.hooks({
+            'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
+                if (currentDoc) {
+                    getCollection().update(currentDoc._id, updateDoc);
+                    return;
+                }
+
+                getCollection().insert(insertDoc);
+
+                this.resetForm();
+                Session.set('selectedDocument', null);
+            }
+        });
+    };
+
     Template.ognoAdminEditForm.helpers({
+        'documentForm' : function () {
+            return documentForm;
+        },
+        'selectedDoc' : function () {
+            return getCollection().findOne(Session.get('selectedDocument'));
+        },
         'formField' : function () {
-            var config = getConfig();
+            var schema = getCollection().simpleSchema()._schema;
 
-            return _.map(_.keys(config), function (key) {
-                return _.extend(config[key], { 'key' : key });
-            });
-        },
-        'inputType' : function () {
-            return OgnoAdmin.typeFactory.get(this.type).inputType;
-        },
-        'inputAttributes' : function () {
-            var attributes = "",
-                doc = getCollection().findOne(Session.get('selectedDocument'));
-
-            if (!_.isObject(doc)) {
-                return '';
+            if (_.isObject(schema)) {
+                return _.map(schema, function (value, key) {
+                    return {
+                        'value' : value,
+                        'field' : key,
+                        'additionalClasses' : value.type === Array ? 'arrayInput' : 'normalInput'
+                    };
+                });
             }
-
-            if (this.required) {
-                attributes += ' required="required" ';
-            }
-
-            attributes += OgnoAdmin.typeFactory.get(this.type).getInputValue(doc[this.key]);
-
-            return attributes;
         },
         'isNotNew' : function () {
-            return Session.get('selectedDocument') !== 'new';
+            return Session.get('selectedDocument') !== 'new' || !Session.get('selectedDocument');
+        },
+        'operationClass' : function () {
+            return Session.get('selectedDocument') !== 'new' ? 'update' : 'insert';
+        },
+        'removeClass': function () {
+            return Session.get('reallyRemove') ? 'remove' : '';
         },
         'removeText' : function () {
             return Session.get('reallyRemove') ? 'Really remove' : 'remove';
@@ -106,7 +126,7 @@
     });
 
     Template.ognoAdminEditForm.events({
-        'click .remove' : function () {
+        'click .removable' : function () {
             if (Session.equals('reallyRemove', true)) {
                 getCollection().remove(Session.get('selectedDocument'));
                 Session.set('reallyRemove', false);
@@ -117,41 +137,8 @@
 
             Session.set('reallyRemove', true);
         },
-        'click .ogno-admin .cancel' : function () {
-            $('.really-remove.modal').modal('hide');
-        },
-        'click .save' : function () {
-            var values = {},
-                collection = getCollection(),
-                config = getConfig(),
-                configKeys = _.keys(config);
-
-            $('#ognoAdminEditForm input').each(function (i) {
-                var type = config[configKeys[i]].type;
-                values[configKeys[i]] = OgnoAdmin.typeFactory.get(type).getDocumentValue($(this));
-            });
-
-            if (_.isFunction(collection.easyInsert)) {
-                collection.easyInsert(values);
-            } else {
-                collection.insert(values);
-            }
-
-            Session.set('selectedDocument', null);
-        },
-        'blur #ognoAdminEditForm input, click #ognoAdminEditForm input[type="checkbox"]' : function (e) {
-            var newValue = OgnoAdmin.typeFactory.get(this.type).getDocumentValue($(e.target)),
-                collection = getCollection(),
-                updatedPartialDoc = {};
-
-            updatedPartialDoc[this.key] = newValue;
-
-            if (_.isFunction(collection.easyUpdate)) {
-                collection.easyUpdate(Session.get('selectedDocument'), { '$set' : updatedPartialDoc });
-                return;
-            }
-
-            collection.update(Session.get('selectedDocument'), { '$set' : updatedPartialDoc });
+        'submit #ognoAdminEditForm' : function (e) {
+            e.preventDefault();
         }
     });
 })();

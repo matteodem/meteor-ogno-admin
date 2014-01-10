@@ -8,6 +8,7 @@
   "packages": {
     "iron-router" : {},
     "semantic-ui" : {},
-    "pagination-mini" : {}
+    "pagination-mini" : {},
+    "autoform" : {}
   }
 }
