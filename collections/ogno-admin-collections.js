@@ -61,13 +61,15 @@
     Template.ognoAdminMainView.events({
         'click .edit-document' : function (e) {
             Session.set('selectedDocument', $(e.target).attr('collection-id'));
+            $('.page.dimmer').dimmer('show');
         },
         'click .add-document' : function () {
             Session.set('selectedDocument', 'new');
+            $('.page.dimmer').dimmer('show');
         }
     });
 
-    Template.ognoAdminMainView.destroyed = function(){
+    Template.ognoAdminMainView.destroyed = function() {
         pagination.destroy();
     };
 
@@ -117,6 +119,9 @@
         'operationClass' : function () {
             return Session.get('selectedDocument') !== 'new' ? 'update' : 'insert';
         },
+        'operation' : function () {
+            return Session.get('selectedDocument') !== 'new' ? 'Edit' : 'Create';
+        },
         'removeClass': function () {
             return Session.get('reallyRemove') ? 'remove' : '';
         },
@@ -126,19 +131,22 @@
     });
 
     Template.ognoAdminEditForm.events({
-        'click .removable' : function () {
+        'click .removable' : function (e) {
             if (Session.equals('reallyRemove', true)) {
                 getCollection().remove(Session.get('selectedDocument'));
                 Session.set('reallyRemove', false);
                 Session.set('selectedDocument', null);
+                $('.page.dimmer').dimmer('hide');
 
                 return;
             }
 
             Session.set('reallyRemove', true);
+            e.preventDefault();
         },
         'submit #ognoAdminEditForm' : function (e) {
             e.preventDefault();
+            $('.page.dimmer').dimmer('hide');
         }
     });
 })();

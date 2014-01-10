@@ -16,40 +16,18 @@ OgnoAdmin.typeFactory.types = {
     'string' : {
         'printValue' : function (val) {
             return val;
-        },
-        'getInputValue' : function (val) {
-            var string = "string" === typeof val ? new Handlebars.SafeString(val) : '';
-            return 'value="' + string + '"';
-        },
-        'getDocumentValue' : function (el) {
-            return el.val();
-        },
-        'inputType' : 'text'
+        }
     },
     'number' : {
         'printValue' : function (val) {
             return val;
-        },
-        'getInputValue' : function (val) {
-            return 'value="' + val + '"';
-        },
-        'getDocumentValue' : function (el) {
-            return el.val().split('.').length > 1 ? parseFloat(el.val()) : parseInt(el.val(), 10);
-        },
-        'inputType' : 'number'
+        }
     },
     'boolean' : {
         'printValue' : function (val) {
-            var icon = val ? 'checkmark' : '';
+            var icon = val ? 'checkmark' : 'ban circle';
             return '<i class="' + icon + ' icon"></i>';
-        },
-        'getInputValue' : function (val) {
-            return val ? 'checked="checked"' : '';
-        },
-        'getDocumentValue' : function (el) {
-            return el.is(':checked');
-        },
-        'inputType' : 'checkbox'
+        }
     },
     'json' : {
         'printValue' : function (val) {
@@ -60,13 +38,6 @@ OgnoAdmin.typeFactory.types = {
             }
 
             return jsonString;
-        },
-        'getInputValue' : function (val) {
-            return 'value="' + _.escape(JSON.stringify(val)) + '"';
-        },
-        'getDocumentValue' : function (el) {
-            return el.val().length > 0 ? JSON.parse(el.val()) : '';
-        },
-        'inputType' : 'text'
+        }
     }
 };

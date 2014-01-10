@@ -31,7 +31,7 @@ OgnoAdmin = (function () {
 
                 _.each(collection.simpleSchema()._schema, function (value, key) {
                     sessionConfig[key] = _.extend(_.clone(value), {
-                        type : value.type.toString().split(/[\w]()/g)[1]
+                        type : value.type.toString().match(/[A-Z][\w]+()/g).shift().toLowerCase()
                     });
                 });
 
