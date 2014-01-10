@@ -126,9 +126,9 @@ OgnoAdmin = (function () {
             });
         }
 
-        // TODO:
-        // TODO: Images, filepicker
         // TODO: Arrays, select2
+        // TODO: Referencing collectons
+        // TODO: filepicker is used, README.md
     }
 
     return {

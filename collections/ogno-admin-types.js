@@ -15,6 +15,12 @@ OgnoAdmin.typeFactory.get = function (name) {
 OgnoAdmin.typeFactory.types = {
     'string' : {
         'printValue' : function (val) {
+            var regex = SchemaRegEx.FilePickerImageUrl.exec(val);
+
+            if (regex && val === regex.shift()) {
+                return '<img class="ui small image" src="' + val + '"/>';
+            }
+
             return val;
         }
     },

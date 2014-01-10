@@ -2,7 +2,7 @@
     {{#if hasMoreItems}}
     {{{pager}}}
     {{/if}}
-    <table class="ui table">
+    <table id="collectionTable" class="ui table sortable">
     <thead>
         <tr>
             {{#each headerValue}}
@@ -50,7 +50,19 @@
                 </div>
             {{/if}}
             <label>{{afFieldLabel field autoform=../this}}</label>
-            {{afFieldInput field autoform=../this class=additionalClasses }}
+
+            {{! Use normal autoform inputs or custom input fields }}
+            {{#if isImageField}}
+                <div class="imageField">
+                    <div data-key="{{this.field}}" data-url="{{dataUrl}}" class="ui blue image button"> Upload image</div>
+                    <div class="ui hidden positive message">
+                        <div class="header">Succesfully uploaded</div>
+                        The image can be found here: <span class="imageUrl"></span>
+                    </div>
+                </div>
+            {{else}}
+                {{afFieldInput field autoform=../../this class=additionalClasses }}
+            {{/if}}
         </div>
         {{/each}}
         <button type="submit" class="ui save {{operationClass}} positive button">Save</button>

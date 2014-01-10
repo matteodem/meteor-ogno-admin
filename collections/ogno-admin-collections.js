@@ -19,6 +19,23 @@
         return OgnoAdmin.typeFactory.get(config.type).printValue(val);
     }
 
+    function getImageValues(doc) {
+        $('.imageField .image.button').each(function () {
+            var url = $(this).attr('data-url');
+
+            if (_.isString(url) && url.length > 10) {
+                doc[$(this).attr('data-key')] = $(this).attr('data-url');
+            }
+        });
+
+        return doc;
+    }
+
+    function insertAt(array, index, item) {
+        array.splice(index, 0, item);
+        return array;
+    }
+
     Template.ognoAdminCollectionsView.helpers({
         'entry' : function () {
             return getCollection().find({}, pagination.skip());
@@ -40,13 +57,14 @@
             return _.isString(Session.get('selectedDocument')) && Session.get('selectedDocument').length > 0;
         },
         'headerValue' : function () {
-            return _.isObject(getCollection().findOne()) ? _.keys(getCollection().findOne()) : [];
+            var config = getConfig();
+            return _.isObject(config) ? insertAt(_.keys(config), 0, '_id') : [];
         },
         'value' : function (doc) {
             var array = [],
                 config = getConfig();
 
-            _.each(_.keys(getCollection().findOne()), function (val) {
+            _.each(insertAt(_.keys(config), 0, '_id'), function (val) {
                 array.push(printValue(doc[val], config[val]));
             });
 
@@ -56,6 +74,10 @@
 
     Template.ognoAdminMainView.created = function () {
         pagination = new Pagination("ognoAdminCollectionsPager");
+    };
+
+    Template.ognoAdminMainView.rendered = function () {
+        sorttable.makeSortable(document.getElementById('collectionTable'));
     };
 
     Template.ognoAdminMainView.events({
@@ -74,14 +96,24 @@
     };
 
     Template.ognoAdminEditForm.created = function () {
+        var config = OgnoAdmin.config();
+
+        // Init autoform
         documentForm = new AutoForm(getCollection().simpleSchema());
+
+        // Init filepicker if a key was given
+        if ("string" === typeof config.filepicker) {
+            filepicker.setKey(config.filepicker);
+        }
     };
 
     Template.ognoAdminEditForm.rendered = function () {
         documentForm.hooks({
             'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
+                insertDoc = getImageValues(insertDoc);
+
                 if (currentDoc) {
-                    getCollection().update(currentDoc._id, updateDoc);
+                    getCollection().update(currentDoc._id, { $set : insertDoc });
                     return;
                 }
 
@@ -89,6 +121,7 @@
 
                 this.resetForm();
                 Session.set('selectedDocument', null);
+                Session.set('uploadedDocument', null);
             }
         });
     };
@@ -127,6 +160,28 @@
         },
         'removeText' : function () {
             return Session.get('reallyRemove') ? 'Really remove' : 'remove';
+        },
+        'isImageField' : function () {
+            if (this.value.regEx instanceof RegExp) {
+                return this.value.regEx.toString() === SchemaRegEx.FilePickerImageUrl.toString();
+            }
+        },
+        'imageUrl' : function (e) {
+            return $('div[data-key="' + this.field + '"]').attr('data-url');
+        },
+        'dataUrl' : function () {
+            var doc = {},
+                id = Session.get('selectedDocument');
+
+            if (_.isString(id)) {
+                doc = getCollection().findOne(Session.get('selectedDocument'));
+            }
+
+            if (_.isObject(doc)) {
+                return doc[this.field];
+            }
+
+            return '';
         }
     });
 
@@ -143,6 +198,15 @@
 
             Session.set('reallyRemove', true);
             e.preventDefault();
+        },
+        'click .image.button' : function (e) {
+            filepicker.pick(function (blob) {
+                var parent = $(e.target).parent();
+
+                $(e.target).attr('data-url', blob.url);
+                parent.find('.hidden.message').removeClass('hidden');
+                parent.find('.imageUrl').html(blob.url);
+            });
         },
         'submit #ognoAdminEditForm' : function (e) {
             e.preventDefault();
