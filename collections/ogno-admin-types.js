@@ -2,6 +2,12 @@ OgnoAdmin.typeFactory = {
     'types' : {}
 };
 
+/**
+ * Returns a type defined in OgnoAdmin.typeFactory.types, if none found: use json.
+ *
+ * @param {String} name
+ * @returns {Object}
+ */
 OgnoAdmin.typeFactory.get = function (name) {
     var t = this.types[name];
 
@@ -12,6 +18,11 @@ OgnoAdmin.typeFactory.get = function (name) {
     return t;
 };
 
+/**
+ * Contains all the types for presenting html input.
+ *
+ * @type {Object}
+ */
 OgnoAdmin.typeFactory.types = {
     'string' : {
         'printValue' : function (val) {

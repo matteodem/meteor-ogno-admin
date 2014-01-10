@@ -6,10 +6,9 @@
   "version": "0.0.1",
   "git": "",
   "packages": {
-    "iron-router" : {},
-    "semantic-ui" : {},
-    "pagination-mini" : {},
     "autoform" : {},
-    "loadpicker" : {}
+    "iron-router" : {},
+    "pagination-mini" : {},
+    "semantic-ui" : {}
   }
 }

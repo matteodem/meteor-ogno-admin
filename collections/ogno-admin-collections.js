@@ -2,15 +2,32 @@
     var pagination,
         documentForm;
 
+    /**
+     * Returns the current selected collection with help of the Session object.
+     *
+     * @returns {Object}
+     */
     function getCollection() {
         var c = OgnoAdmin.getCollection(Session.get('ognoAdminCurrentView').type);
         return "object" === typeof c ? c : {};
     }
 
+    /**
+     * Returns the current configuration for the view.
+     *
+     * @returns {Object}
+     */
     function getConfig() {
         return Session.get('ognoAdminCurrentView').config;
     }
 
+    /**
+     * Returns a valid html representation of the value.
+     *
+     * @param {*} val
+     * @param {Object} config
+     * @returns {string}
+     */
     function printValue(val, config) {
         if (!config) {
             return val;
@@ -19,6 +36,12 @@
         return OgnoAdmin.typeFactory.get(config.type).printValue(val);
     }
 
+    /**
+     * Returns a document, enhanced with the filepicker images.
+     *
+     * @param {Object} doc
+     * @returns {Object}
+     */
     function getImageValues(doc) {
         $('.imageField .image.button').each(function () {
             var url = $(this).attr('data-url');
@@ -31,11 +54,25 @@
         return doc;
     }
 
+    /**
+     * Insert an item at a specific position of an array.
+     *
+     * @param {Array} array
+     * @param {Number} index
+     * @param {*} item
+     *
+     * @returns {Array}
+     */
     function insertAt(array, index, item) {
         array.splice(index, 0, item);
         return array;
     }
 
+    /* -------------
+      Collection View
+      -------------- */
+
+    // Helpers
     Template.ognoAdminCollectionsView.helpers({
         'entry' : function () {
             return getCollection().find({}, pagination.skip());
@@ -72,14 +109,17 @@
         }
     });
 
+    // Created
     Template.ognoAdminMainView.created = function () {
         pagination = new Pagination("ognoAdminCollectionsPager");
     };
 
+    // Rendered
     Template.ognoAdminMainView.rendered = function () {
         sorttable.makeSortable(document.getElementById('collectionTable'));
     };
 
+    // Events
     Template.ognoAdminMainView.events({
         'click .edit-document' : function (e) {
             Session.set('selectedDocument', $(e.target).attr('collection-id'));
@@ -91,10 +131,16 @@
         }
     });
 
+    // Destroyed
     Template.ognoAdminMainView.destroyed = function() {
         pagination.destroy();
     };
 
+    /* -------------
+     Edit Form View
+     -------------- */
+
+    // Created
     Template.ognoAdminEditForm.created = function () {
         var config = OgnoAdmin.config();
 
@@ -107,6 +153,7 @@
         }
     };
 
+    // Rendered
     Template.ognoAdminEditForm.rendered = function () {
         documentForm.hooks({
             'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
@@ -126,6 +173,7 @@
         });
     };
 
+    // Helpers
     Template.ognoAdminEditForm.helpers({
         'documentForm' : function () {
             return documentForm;
@@ -185,6 +233,7 @@
         }
     });
 
+    // Events
     Template.ognoAdminEditForm.events({
         'click .removable' : function (e) {
             if (Session.equals('reallyRemove', true)) {

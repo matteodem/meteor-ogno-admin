@@ -8,13 +8,26 @@ OgnoAdmin = (function () {
             }
         };
 
-    function slugify(Text)
+    /**
+     * Returns a slugified text, for links.
+     *
+     * @param {String} text
+     * @returns {String}
+     */
+    function slugify(text)
     {
-        return Text.toLowerCase()
+        return text.toLowerCase()
             .replace(/ /g,'-')
             .replace(/[^\w-]+/g,'');
     }
 
+    /**
+     * Returns a fully converted structure, useable by ogno-admin.
+     *
+     * @param {Object}  s       the new Structure
+     * @param {Boolean} isRoot  True if its firstly called (not nested).
+     * @returns {Array}
+     */
     function setUpStructure(s, isRoot) {
         var fullStructure = _.map(s, function (e) {
             var collection;
@@ -64,7 +77,13 @@ OgnoAdmin = (function () {
         return fullStructure;
     }
 
-    function getStructureWithParameters(p) {
+    /**
+     * Returns a part / sector of the structure with iron-router data parameters.
+     *
+     * @param {Object} p
+     * @returns {Object}
+     */
+    function getSectorOfStructureWithParameters(p) {
         var s = structure;
 
         if (p.pid) {
@@ -80,6 +99,13 @@ OgnoAdmin = (function () {
         return s;
     }
 
+    /**
+     * Single time initializion, for ogno-admin, with the configuration.
+     *
+     * Uses the config object for:
+     *  'prefix' : '/admin'                         // Change the prefixing for the admin UI
+     *  'homeScreenTemplate' : 'adminHomeScreen'    // The template name for dashboard
+     */
     function init() {
         Router.map(function () {
             var routerConfig = function (path, o) {
@@ -93,7 +119,7 @@ OgnoAdmin = (function () {
                     },
                     'data' : function () {
                         var data = {},
-                            s = getStructureWithParameters(this.params);
+                            s = getSectorOfStructureWithParameters(this.params);
 
                         if (s && _.isObject(s.type)) {
                             Session.set('ognoAdminCurrentView', s);
@@ -126,12 +152,20 @@ OgnoAdmin = (function () {
             });
         }
 
+        // TODO: Code documentations, README.md
+        // TODO: https://github.com/aldeed/meteor-simple-schema/issues/44
         // TODO: Arrays, select2
-        // TODO: Referencing collectons
-        // TODO: filepicker is used, README.md
+        // TODO: Referencing collections
     }
 
+    // Public API
     return {
+        /**
+         * Initialize ogno-admin (Server and Client side).
+         *
+         * @param {Object} c
+         * @returns {Object} Current configuration
+         */
         'config' : function (c) {
             if ("undefined" === typeof c) {
                 return config;
@@ -140,6 +174,12 @@ OgnoAdmin = (function () {
             config = _.extend(config, c);
             init();
         },
+        /**
+         * The structure for the admin ui.
+         *
+         * @param {Array} s
+         * @returns {Array}
+         */
         'structure' : function (s) {
             if ("undefined" === typeof s) {
                 return structure;
@@ -147,9 +187,20 @@ OgnoAdmin = (function () {
 
             structure = setUpStructure(s, true);
         },
+        /**
+         * Return true if people can view the admin interface, is configurable.
+         *
+         * @returns {Boolean}
+         */
         'isAllowed' : function () {
             return config.isAllowed();
         },
+        /**
+         * Returns the collection with the p.reference provided.
+         *
+         * @param {Object} p
+         * @returns {Object}
+         */
         'getCollection' : function (p) {
             return collections[p.reference] ? collections[p.reference] : {};
         }
