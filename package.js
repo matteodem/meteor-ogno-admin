@@ -14,7 +14,7 @@ Package.on_use(function (api, where) {
     // Collection view
     api.add_files(
         ['collections/ogno-admin-collections.html', 'collections/ogno-admin-collections.js',
-            'collections/ogno-admin-collections.less', 'collections/ogno-admin-types.js', 'lib/sorttable.js'],
+            'collections/ogno-admin-collections.less', 'collections/ogno-admin-types.js'],
         'client'
     );
 
@@ -26,7 +26,7 @@ Package.on_use(function (api, where) {
 
     api.use(
         ['less', 'underscore', 'accounts-base', 'templating', 'livedata', 'mongo-livedata', 'jquery', 'filepicker',
-            'iron-router', 'semantic-ui', 'session', 'pagination-mini', 'autoform', 'simple-schema', 'handlebars']
+            'iron-router', 'semantic-ui', 'session', 'pagination-mini', 'autoform', 'simple-schema', 'handlebars', 'check']
     );
 
     api.export('OgnoAdmin');

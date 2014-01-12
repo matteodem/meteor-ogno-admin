@@ -43,9 +43,23 @@ OgnoAdmin = (function () {
                 e.type = { 'view' : 'collections', 'reference' :  e.use._name };
 
                 _.each(collection.simpleSchema()._schema, function (value, key) {
-                    sessionConfig[key] = _.extend(_.clone(value), {
-                        type : value.type.toString().match(/[A-Z][\w]+()/g).shift().toLowerCase()
-                    });
+                    var fieldName,
+                        collectionName;
+
+                    if (key.indexOf('.$') > -1) {
+                        return;
+                    }
+
+                    if (_.isObject(value.ognoAdmin) && _.isObject(value.ognoAdmin.references)) {
+                        collectionName = value.ognoAdmin.references._name;
+                        fieldName = value.ognoAdmin.field ? value.ognoAdmin.field : '_id';
+                    }
+
+                    sessionConfig[key] = {
+                        type : value.type.toString().match(/[A-Z][\w]+()/g).shift().toLowerCase(),
+                        references : collectionName,
+                        field : fieldName
+                    };
                 });
 
                 e.config = sessionConfig;
@@ -152,11 +166,17 @@ OgnoAdmin = (function () {
             });
         }
 
-        // TODO: Code documentations, README.md
-        // TODO: https://github.com/aldeed/meteor-simple-schema/issues/44
-        // TODO: Arrays, select2
-        // TODO: Referencing collections
+        // TODO: README.md (how to images!)
+        // TODO: Why type.$ ?
     }
+
+    // Custom FilePicker RegEx, enhancing Simple-Schema
+    SchemaRegEx.FilePickerImageUrl = /(https?:\/\/www.filepicker.io\/api\/file\/[\w]+)/i;
+
+    // Custom property called "ognoAdmin"
+    SimpleSchema.extendOptions({
+        'ognoAdmin' : Match.Optional(Object)
+    });
 
     // Public API
     return {
@@ -196,13 +216,13 @@ OgnoAdmin = (function () {
             return config.isAllowed();
         },
         /**
-         * Returns the collection with the p.reference provided.
+         * Returns the collection with the _name attrbute of the collection provided.
          *
-         * @param {Object} p
+         * @param {String} p
          * @returns {Object}
          */
         'getCollection' : function (p) {
-            return collections[p.reference] ? collections[p.reference] : {};
+            return collections[p] ? collections[p] : {};
         }
     };
 })();

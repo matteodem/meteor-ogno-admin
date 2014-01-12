@@ -38,37 +38,39 @@
 </template>
 
 <template name="ognoAdminEditForm">
-    <h1>{{siteTitle}} {{operation}} Form</h1>
-    {{#autoForm schema=documentForm doc=selectedDoc id="ognoAdminEditForm"}}
-    <div class="ui form">
-        <!-- Use easy-template later -->
-        {{#each formField}}
-        <div class="field">
-            {{#if afFieldIsInvalid field autoform=../this}}
-                <div class="ui error message">
-                    {{afFieldMessage field autoform=../../this}}
-                </div>
-            {{/if}}
-            <label>{{afFieldLabel field autoform=../this}}</label>
-
-            {{! Use normal autoform inputs or custom input fields }}
-            {{#if isImageField}}
-                <div class="imageField">
-                    <div data-key="{{this.field}}" data-url="{{dataUrl}}" class="ui blue image button"> Upload image</div>
-                    <div class="ui hidden positive message">
-                        <div class="header">Succesfully uploaded</div>
-                        The image can be found here: <span class="imageUrl"></span>
+    <h1>{{siteTitle}} {{operation}} Form <button class="ui icon inverted basic button"><i class="close dimmer icon"></i></button></h1>
+    {{#if editMode}}
+        {{#autoForm schema=documentForm doc=selectedDoc id="ognoAdminEditForm"}}
+        <div class="ui form">
+            <!-- Use easy-template later -->
+            {{#each formField}}
+            <div class="field">
+                {{#if afFieldIsInvalid field autoform=../this}}
+                    <div class="ui error message">
+                        {{afFieldMessage field autoform=../../this}}
                     </div>
-                </div>
-            {{else}}
-                {{afFieldInput field autoform=../../this class=additionalClasses }}
+                {{/if}}
+                <label>{{afFieldLabel field autoform=../this}}</label>
+
+                {{! Use normal autoform inputs or custom input fields }}
+                {{#if isImageField}}
+                    <div class="imageField">
+                        <div data-key="{{this.field}}" data-url="{{dataUrl}}" class="ui blue image button"> Upload image</div>
+                        <div class="ui hidden positive message">
+                            <div class="header">Succesfully uploaded</div>
+                            The image can be found here: <span class="imageUrl"></span>
+                        </div>
+                    </div>
+                {{else}}
+                    {{afFieldInput field autoform=../../this options=ognoAdminOptions class=additionalClasses }}
+                {{/if}}
+            </div>
+            {{/each}}
+            <button type="submit" class="ui save {{operationClass}} positive button">Save</button>
+            {{#if isNotNew}}
+            <button type="submit" class="ui {{removeClass}} removable red button">{{removeText}}</button>
             {{/if}}
         </div>
-        {{/each}}
-        <button type="submit" class="ui save {{operationClass}} positive button">Save</button>
-        {{#if isNotNew}}
-        <button type="submit" class="ui {{removeClass}} removable red button">{{removeText}}</button>
-        {{/if}}
-    </div>
-    {{/autoForm}}
+        {{/autoForm}}
+    {{/if}}
 </template>

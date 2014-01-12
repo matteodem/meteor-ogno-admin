@@ -9,6 +9,7 @@
     "autoform" : {},
     "iron-router" : {},
     "pagination-mini" : {},
-    "semantic-ui" : {}
+    "semantic-ui" : {},
+    "simple-schema": {}
   }
 }

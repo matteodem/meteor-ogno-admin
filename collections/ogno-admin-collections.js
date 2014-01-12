@@ -8,7 +8,7 @@
      * @returns {Object}
      */
     function getCollection() {
-        var c = OgnoAdmin.getCollection(Session.get('ognoAdminCurrentView').type);
+        var c = OgnoAdmin.getCollection(Session.get('ognoAdminCurrentView').type.reference);
         return "object" === typeof c ? c : {};
     }
 
@@ -33,7 +33,7 @@
             return val;
         }
 
-        return OgnoAdmin.typeFactory.get(config.type).printValue(val);
+        return OgnoAdmin.typeFactory.get(config).printValue(val);
     }
 
     /**
@@ -68,6 +68,22 @@
         return array;
     }
 
+    Handlebars.registerHelper('ognoAdminOptions', function () {
+        var that = this;
+
+        if (_.isObject(this.value.ognoAdmin)) {
+            return _.map(this.value.ognoAdmin.references.find().fetch(), function (doc) {
+                var field = doc[that.value.ognoAdmin.field];
+
+                field = field ? field : doc._id;
+
+                return { label : field, value: doc._id };
+            });
+        }
+
+        return false;
+    });
+
     /* -------------
       Collection View
       -------------- */
@@ -90,9 +106,6 @@
         'isActive' : function () {
             return this._id === Session.get('selectedDocument') ? 'inverted teal active' : 'not-active';
         },
-        'editMode' : function () {
-            return _.isString(Session.get('selectedDocument')) && Session.get('selectedDocument').length > 0;
-        },
         'headerValue' : function () {
             var config = getConfig();
             return _.isObject(config) ? insertAt(_.keys(config), 0, '_id') : [];
@@ -112,11 +125,6 @@
     // Created
     Template.ognoAdminMainView.created = function () {
         pagination = new Pagination("ognoAdminCollectionsPager");
-    };
-
-    // Rendered
-    Template.ognoAdminMainView.rendered = function () {
-        sorttable.makeSortable(document.getElementById('collectionTable'));
     };
 
     // Events
@@ -155,16 +163,36 @@
 
     // Rendered
     Template.ognoAdminEditForm.rendered = function () {
+        var arrayInputs = $('select.arrayInput');
+
+        // TODO: Why the ".$" attributes ?
+        $('#ognoAdminEditForm .normalInput[name*=".$"]').parent().hide();
+
+        if (_.isFunction(arrayInputs.select2)) {
+            arrayInputs.select2({
+                'width' : 200
+            });
+        }
+
+        // Init autoform
+        documentForm = new AutoForm(getCollection().simpleSchema());
+
         documentForm.hooks({
             'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
+                var cb = function (err) {
+                    if (!err) {
+                        $('.page.dimmer').dimmer('hide');
+                    }
+                };
+
                 insertDoc = getImageValues(insertDoc);
 
                 if (currentDoc) {
-                    getCollection().update(currentDoc._id, { $set : insertDoc });
+                    getCollection().update(currentDoc._id, { $set : insertDoc }, cb);
                     return;
                 }
 
-                getCollection().insert(insertDoc);
+                getCollection().insert(insertDoc, cb);
 
                 this.resetForm();
                 Session.set('selectedDocument', null);
@@ -175,6 +203,9 @@
 
     // Helpers
     Template.ognoAdminEditForm.helpers({
+        'editMode' : function () {
+            return Session.get('selectedDocument');
+        },
         'documentForm' : function () {
             return documentForm;
         },
@@ -259,6 +290,8 @@
         },
         'submit #ognoAdminEditForm' : function (e) {
             e.preventDefault();
+        },
+        'click .close.dimmer' : function (e) {
             $('.page.dimmer').dimmer('hide');
         }
     });
