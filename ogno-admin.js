@@ -1,6 +1,12 @@
 OgnoAdmin = (function () {
     var structure = [{ 'menu-title' : 'Dashboard', 'icon' : 'dashboard', 'slug' : '', 'weight' : '1' }],
         collections = {},
+        jsTypes = {
+            'string' : String,
+            'number' : Number,
+            'object' : Object,
+            'boolean' : Boolean
+        },
         config = {
             'prefix' : '/ogno-admin',
             'isAllowed' : function () {
@@ -22,6 +28,57 @@ OgnoAdmin = (function () {
     }
 
     /**
+     * Return a Meteor.Collection instance, enhanced with a simpleSchema() method.
+     *
+     * @param {Object} config
+     * @returns {Object}
+     */
+    function addSimpleSchemaToCollection(collection, schema) {
+        // if no schema provided
+        if (_.isUndefined(schema)) {
+            schema = fakeSimpleSchema(collection.findOne());
+        }
+
+        // fake simpleSchema method
+        collection.simpleSchema = function () {
+            return new SimpleSchema(schema);
+        };
+
+        return collection;
+    }
+
+    /**
+     * Return simple schema object configuration, configured with a mongo doc.
+     *
+     * @param {Object} doc
+     * @returns {Object}
+     */
+    function fakeSimpleSchema(doc) {
+        var conf;
+
+        if (_.isObject(doc)) {
+            conf = {};
+
+            delete doc._id;
+
+            _.each(doc, function (value, key) {
+                var type = _.isArray(value) ? Array : jsTypes[typeof value];
+
+                if (!type) {
+                    return;
+                }
+
+                conf[key] = {
+                    'type' : type,
+                    'optional' : !type
+                };
+            });
+        }
+
+        return conf;
+    }
+
+    /**
      * Returns a fully converted structure, useable by ogno-admin.
      *
      * @param {Object}  s       the new Structure
@@ -30,16 +87,34 @@ OgnoAdmin = (function () {
      */
     function setUpStructure(s, isRoot) {
         var fullStructure = _.map(s, function (e) {
-            var collection;
+            var schema,
+                collection,
+                sessionConfig = {};
 
             if ("tree" === e.type) {
                 // is a sub menu tree
                 e.type = setUpStructure(e.use);
             } else if ("collection" === e.type) {
-                var sessionConfig = {};
 
                 // is a collection view
-                collections[e.use._name] = collection = e.use;
+                if (_.isObject(e.use) && e.use.collection) {
+                    collection = e.use.collection;
+                } else {
+                    collection = e.use;
+                }
+
+                if (_.isObject(e.use) && e.use.schema) {
+                    schema = e.use.schema;
+                }
+
+                // if not a collection 2 view, add a simpleSchema() method
+                if (!_.isFunction(collection.simpleSchema)) {
+                    Deps.autorun(function () {
+                        collection = addSimpleSchemaToCollection(collection, schema);
+                    });
+                }
+
+                collections[e.use._name] = collection;
                 e.type = { 'view' : 'collections', 'reference' :  e.use._name };
 
                 _.each(collection.simpleSchema()._schema, function (value, key) {
@@ -137,6 +212,7 @@ OgnoAdmin = (function () {
 
                         if (s && _.isObject(s.type)) {
                             Session.set('ognoAdminCurrentView', s);
+                            Session.set('viewParams', this.params);
                         }
 
                         return data;
@@ -166,8 +242,12 @@ OgnoAdmin = (function () {
             });
         }
 
+        // TODO: auto property
         // TODO: README.md (how to images!)
+        // TODO: Write tests
+        // TODO: Add link to github in ogno-admin-collections.html, icon message
         // TODO: Why type.$ ?
+        // TODO: Rewrite to not use Sessions and make a private reactive object where to store all data!
     }
 
     // Custom FilePicker RegEx, enhancing Simple-Schema

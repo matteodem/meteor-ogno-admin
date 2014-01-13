@@ -1,40 +1,57 @@
 <template name="ognoAdminCollectionsView">
     {{#if hasMoreItems}}
-    {{{pager}}}
+        {{{pager}}}
     {{/if}}
-    <table id="collectionTable" class="ui table sortable">
-    <thead>
-        <tr>
-            {{#each headerValue}}
+
+    {{! Is only called when its a Meteor.Collection and has no schema provided }}
+    {{#if needsSchema}}
+        <div class="ui red icon message">
+            <i class="inbox icon"></i>
+            <div class="header">
+                Needs a Mongo Document or Schema Configuration
+            </div>
+            <ul class="list">
+                <li>Use <a href="">Collection2</a></li>
+                <li>Provide a Simple <a href="">Schema Configuration</a>.</li>
+                <li>Insert a document into the Collection</li>
+            </ul>
+        </div>
+    {{else}}
+        <table id="collectionTable" class="ui table sortable">
+            <thead>
+            <tr>
+                {{#each headerValue}}
                 <th>{{this}}</th>
+                {{/each}}
+                <th>Actions</th>
+            </tr>
+            </thead>
+            {{#each entry}}
+            <tr class="{{isActive}}">
+                {{#each value this}}
+                <td>{{{this}}}</td>
+                {{/each}}
+                <td>
+                    <div class="ui teal edit-document button" collection-id="{{_id}}">Edit</div>
+                </td>
+            </tr>
             {{/each}}
-            <th>Actions</th>
-        </tr>
-    </thead>
-    {{#each entry}}
-        <tr class="{{isActive}}">
-            {{#each value this}}
-            <td>{{{this}}}</td>
-            {{/each}}
-            <td>
-                <div class="ui teal edit-document button" collection-id="{{_id}}">Edit</div>
-            </td>
-        </tr>
-    {{/each}}
-    </table>
-    {{#if hasMoreItems}}
-    {{{pager}}}
-    {{/if}}
+        </table>
 
-    <div class="ui purple add-document button"><i class="add icon"></i>Add</div>
+        {{#if hasMoreItems}}
+            {{{pager}}}
+        {{/if}}
 
-    <div class="ui page dimmer">
-        <div class="content">
-            <div class="center">
-                {{> ognoAdminEditForm}}
+        <div class="ui purple add-document button"><i class="add icon"></i>Add</div>
+
+        <div class="ui page dimmer">
+            <div class="content">
+                <div class="center">
+                    {{> ognoAdminEditForm}}
+                </div>
             </div>
         </div>
-    </div>
+    {{/if}}
 </template>
 
 <template name="ognoAdminEditForm">

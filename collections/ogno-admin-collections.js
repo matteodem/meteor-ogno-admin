@@ -110,6 +110,9 @@
             var config = getConfig();
             return _.isObject(config) ? insertAt(_.keys(config), 0, '_id') : [];
         },
+        'needsSchema' : function () {
+            return _.isEmpty(getCollection().simpleSchema()._schema);
+        },
         'value' : function (doc) {
             var array = [],
                 config = getConfig();
@@ -152,7 +155,6 @@
     Template.ognoAdminEditForm.created = function () {
         var config = OgnoAdmin.config();
 
-        // Init autoform
         documentForm = new AutoForm(getCollection().simpleSchema());
 
         // Init filepicker if a key was given
