@@ -119,10 +119,8 @@ OgnoAdmin = (function () {
                 }
 
                 // if not a collection 2 view, add a simpleSchema() method
-                if (!_.isFunction(collection.simpleSchema)) {
-                    Deps.autorun(function () {
-                        collection = addSimpleSchemaToCollection(collection, schema);
-                    });
+                if (!_.isFunction(collection.simpleSchema) || !collection.simpleSchema()) {
+                    collection = addSimpleSchemaToCollection(collection, schema);
                 }
 
                 collections[e.use._name] = collection;
