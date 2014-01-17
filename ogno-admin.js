@@ -101,7 +101,7 @@ OgnoAdmin = (function () {
                 collection,
                 sessionConfig = {};
 
-            if (e.tree) {
+            if (e.tree && isRoot) {
                 // is a sub menu tree
                 e.type = setUpStructure(e.tree);
             }
