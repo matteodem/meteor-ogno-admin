@@ -104,7 +104,9 @@ OgnoAdmin = (function () {
             if (e.tree) {
                 // is a sub menu tree
                 e.type = setUpStructure(e.tree);
-            } else if ("collection" === e.type) {
+            }
+
+            if ("collection" === e.type) {
                 // is a collection view
                 if (_.isObject(e.use) && e.use.collection) {
                     collection = e.use.collection;
@@ -256,31 +258,31 @@ OgnoAdmin = (function () {
         });
 
         if (config.auto) {
-            globalCollections = [];
+            Meteor.startup(function () {
+                globalCollections = [];
 
-            for (collection in window) if (window.hasOwnProperty(collection)
-                // Check if its an instance of Meteor.Collection or Meteor.Collection2
-                && (window[collection] instanceof Meteor.Collection
-                || window[collection] instanceof Meteor.Collection2)) {
-                globalCollections.push({
-                    'type' : 'collection',
-                    'use'  : window[collection],
-                    'menu-title' : prettify(window[collection]._name),
-                    'site-title' : "Manage " + window[collection]._name
-                });
-            }
+                for (collection in window) if (window.hasOwnProperty(collection)
+                    // Check if its an instance of Meteor.Collection or Meteor.Collection2
+                    && (window[collection] instanceof Meteor.Collection
+                    || window[collection] instanceof Meteor.Collection2)) {
+                    globalCollections.push({
+                        'type' : 'collection',
+                        'use'  : window[collection],
+                        'menu-title' : prettify(window[collection]._name),
+                        'site-title' : "Manage " + window[collection]._name
+                    });
+                }
 
-            structure = setUpStructure({
-                'weight' : 5,
-                'type'   : 'no-link',
-                'icon'   : 'archive',
-                'tree'   : globalCollections,
-                'menu-title' : 'Collections'
-            }, true);
+                structure = setUpStructure({
+                    'weight' : 5,
+                    'type'   : 'no-link',
+                    'icon'   : 'archive',
+                    'tree'   : globalCollections,
+                    'menu-title' : 'Collections'
+                }, true);
+            });
         }
 
-        // TODO: Write tests
-        // TODO: Why type.$ ?
         // TODO: README.md (also how to images!)
         // TODO: Add link to github in ogno-admin-collections.html, icon message
 
@@ -341,6 +343,14 @@ OgnoAdmin = (function () {
          */
         'getCollection' : function (p) {
             return collections[p] ? collections[p] : {};
+        },
+        /**
+         * Helpers object to test them.
+         */
+        '_helpers' : {
+            'slugify' : slugify,
+            'prettify' : prettify,
+            'fakeSimpleSchema' : fakeSimpleSchema
         }
     };
 })();

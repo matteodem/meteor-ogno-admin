@@ -2,10 +2,26 @@ Template.ognoAdminMenu.helpers({
     'mainItem' : function () {
         return Session.get('ognoStructure');
     },
-    'isActive' : function () {
+    'isActive' : function (parent) {
+        var isActive,
+            parentIsActive = true,
+            currentParams = Router.current().params;
+
         this.slug = "string" === typeof this.path ? this.path.slice(1) : this.slug;
-        // Later, check also for pid if isSub Item!
-        return this.slug === Router.current().params.id ? 'active' : 'not-active';
+
+        // always check pid
+        isActive = this.slug === currentParams.id;
+
+        // If there's a parent slug and also current parameters have it
+        if (parent.slug && currentParams.pid) {
+            parentIsActive = currentParams.pid === parent.slug;
+        } else if (currentParams.pid) {
+            // if there's no parent on current menu entry
+            // but the current parameters have one
+            parentIsActive = false;
+        }
+
+        return isActive && parentIsActive ? 'active' : 'not-active';
     },
     'tag' : function () {
         return this['no-link'] || _.isArray(this.type) ? 'div' : 'a';
