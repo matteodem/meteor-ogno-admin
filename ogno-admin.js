@@ -280,12 +280,6 @@ OgnoAdmin = (function () {
                 }, true);
             });
         }
-
-        // TODO: README.md (also how to images!)
-        // TODO: Add link to github in ogno-admin-collections.html, icon message
-
-        // Enhancement: Check page dimmer
-        // Enhancement: Rewrite to not use Sessions and make a private reactive object where to store all data!
     }
 
     // Custom FilePicker RegEx, enhancing Simple-Schema
