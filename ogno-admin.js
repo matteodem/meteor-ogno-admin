@@ -28,6 +28,14 @@ OgnoAdmin = (function () {
     }
 
     /**
+     * Returns a string more human readable, by prettifying it.
+     */
+    function prettify(string) {
+        string = string.replace(/[-_]+/g, ' ');
+        return string.charAt(0).toUpperCase() + string.slice(1)
+    }
+
+    /**
      * Return a Meteor.Collection instance, enhanced with a simpleSchema() method.
      *
      * @param {Object} config
@@ -70,7 +78,7 @@ OgnoAdmin = (function () {
 
                 conf[key] = {
                     'type' : type,
-                    'optional' : !type
+                    'optional' : !value
                 };
             });
         }
@@ -86,16 +94,17 @@ OgnoAdmin = (function () {
      * @returns {Array}
      */
     function setUpStructure(s, isRoot) {
+        s = _.isArray(s) ? s : [s];
+
         var fullStructure = _.map(s, function (e) {
             var schema,
                 collection,
                 sessionConfig = {};
 
-            if ("tree" === e.type) {
+            if (e.tree) {
                 // is a sub menu tree
-                e.type = setUpStructure(e.use);
+                e.type = setUpStructure(e.tree);
             } else if ("collection" === e.type) {
-
                 // is a collection view
                 if (_.isObject(e.use) && e.use.collection) {
                     collection = e.use.collection;
@@ -196,6 +205,8 @@ OgnoAdmin = (function () {
      *  'homeScreenTemplate' : 'adminHomeScreen'    // The template name for dashboard
      */
     function init() {
+        var globalCollections;
+
         Router.map(function () {
             var routerConfig = function (path, o) {
                 var defaultConf = {
@@ -227,27 +238,54 @@ OgnoAdmin = (function () {
             this.route('ognoAdminSubPage', routerConfig('/:pid/:id'));
         });
 
-        if (Meteor.isClient) {
-            Handlebars.registerHelper('canView', function () {
-                return OgnoAdmin.isAllowed();
-            });
-
-            Template.ognoAdminOverview.helpers({
-                'customizedHomeScreen' : function () {
-                    return config.homeScreenTemplate;
-                },
-                'customHomeScreenContent' : function () {
-                    return Template[config.homeScreenTemplate]();
-                }
-            });
+        if (!Meteor.isClient) {
+            return;
         }
 
-        // TODO: auto property
-        // TODO: README.md (how to images!)
+        Handlebars.registerHelper('canView', function () {
+            return OgnoAdmin.isAllowed();
+        });
+
+        Template.ognoAdminOverview.helpers({
+            'customizedHomeScreen' : function () {
+                return config.homeScreenTemplate;
+            },
+            'customHomeScreenContent' : function () {
+                return Template[config.homeScreenTemplate]();
+            }
+        });
+
+        if (config.auto) {
+            globalCollections = [];
+
+            for (collection in window) if (window.hasOwnProperty(collection)
+                // Check if its an instance of Meteor.Collection or Meteor.Collection2
+                && (window[collection] instanceof Meteor.Collection
+                || window[collection] instanceof Meteor.Collection2)) {
+                globalCollections.push({
+                    'type' : 'collection',
+                    'use'  : window[collection],
+                    'menu-title' : prettify(window[collection]._name),
+                    'site-title' : "Manage " + window[collection]._name
+                });
+            }
+
+            structure = setUpStructure({
+                'weight' : 5,
+                'type'   : 'no-link',
+                'icon'   : 'archive',
+                'tree'   : globalCollections,
+                'menu-title' : 'Collections'
+            }, true);
+        }
+
         // TODO: Write tests
-        // TODO: Add link to github in ogno-admin-collections.html, icon message
         // TODO: Why type.$ ?
-        // TODO: Rewrite to not use Sessions and make a private reactive object where to store all data!
+        // TODO: README.md (also how to images!)
+        // TODO: Add link to github in ogno-admin-collections.html, icon message
+
+        // Enhancement: Check page dimmer
+        // Enhancement: Rewrite to not use Sessions and make a private reactive object where to store all data!
     }
 
     // Custom FilePicker RegEx, enhancing Simple-Schema
