@@ -3,7 +3,9 @@ Ogno-Admin
 
 This package creates an Admin UI with a menu structure and configuration through the ``OgnoAdmin`` API.
 It validates itself with the [simple-schema](https://github.com/aldeed/meteor-simple-schema) package and generates
-the create / edit forms with [autoform](https://github.com/aldeed/meteor-autoform).
+the create / edit forms with [autoform](https://github.com/aldeed/meteor-autoform). Routes are created with
+[iron-router](https://github.com/EventedMind/iron-router) and the html, css is enhanced with
+[semantic-ui](https://github.com/nooitaf/meteor-semantic-ui).
 
 ## Quick Intro
 ```javascript
