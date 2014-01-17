@@ -39,7 +39,7 @@ mrt add ogno-admin
 
 You can enhance the menu structure for your Admin UI with your own menu views, by using the API.
 
-```
+```javascript
 Meteor.startup(function () {
     OgnoAdmin.structure({
         'weight'     : 5,
