@@ -1,10 +1,10 @@
 {
   "name": "ogno-admin",
-  "description": "",
-  "homepage": "",
-  "author": "",
-  "version": "0.0.1",
-  "git": "",
+  "description": "Extendable, zero-config admin UI for Meteor",
+  "homepage": "https://github.com/matteodem/meteor-ogno-admin",
+  "author": "Matteo De Micheli",
+  "version": "0.2.0",
+  "git": "https://github.com/matteodem/meteor-ogno-admin.git",
   "packages": {
     "autoform" : {},
     "iron-router" : {},

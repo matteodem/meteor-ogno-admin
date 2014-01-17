@@ -1,5 +1,5 @@
 Package.describe({
-  summary: "Easy to use / extendable admin UI"
+  summary: "Extendable, zero-config admin UI for Meteor"
 });
 
 Package.on_use(function (api, where) {
