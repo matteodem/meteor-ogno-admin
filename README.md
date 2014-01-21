@@ -80,7 +80,7 @@ Meteor.startup(function () {
         'weight'        : Number,  // Sort order for all menu elements / views
         'type'          : String,  // View type, currently "collection" or "custom"
         'slug'          : String,  // Custom url slug, gets auto-defined if none
-        'icon'          : String,  // UI Menu Icons: http://semantic-ui.com/elements/icon.html
+        'icon'          : String,  // http://semantic-ui.com/elements/icon.html
         'menu-title'    : String,  // The Menu title, gets auto-defined if none
         'site-title'    : String,  // Custom site title, gets auto-defined if none
         'use'           : 'Mixed', // Additional information for "type", variates
