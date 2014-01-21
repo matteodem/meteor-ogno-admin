@@ -37,7 +37,7 @@ mrt add ogno-admin
 
 ## Enhance UI with Structure
 
-You can enhance the menu structure for your Admin UI with your own menu views, by using the API.
+You can enhance the menu structure for your Admin UI with your own views, by using the API.
 
 ```javascript
 Meteor.startup(function () {
@@ -48,11 +48,15 @@ Meteor.startup(function () {
         'menu-title' : 'Collections',
         'tree'   : [
             {
+                // Type is a collection view, which creates a view with
+                // all CRUD operations handled
                 'type' : 'collection',
-                'use'  : (instanceof Meteor.Collection2),
+                'use'  : (instanceof Meteor.Collection2 || Meteor.Collection),
                 'menu-title' : 'Some Collection'
             },
             {
+                // Type is a custom view, which will render a custom template
+                // it is accessed through Template[templateString]
                 'type' : 'custom',
                 'use'  : 'templateString',
                 'menu-title' : 'Some custom view'
@@ -66,8 +70,39 @@ Meteor.startup(function () {
 It's also possible to use an array as the first parameter. It doesn't replace the existing menu structure but extends it,
 so you can have multiple structure() calls in your code.
 
-The ``tree`` is only useable on the root menu elements.
+The ``tree`` is only useable on the root menu elements. Use weight to define the order of the menu elements.
 
+## Possible properties for views
+```javascript
+Meteor.startup(function () {
+    OgnoAdmin.structure({
+        'tree'          : Array,   // Define sub elements, only possible on root
+        'weight'        : Number,  // Sort order for all menu elements / views
+        'type'          : String,  // View type, currently "collection" or "custom"
+        'slug'          : String,  // Custom url slug, gets auto-defined if none
+        'icon'          : String,  // UI Menu Icons: http://semantic-ui.com/elements/icon.html
+        'menu-title'    : String,  // The Menu title, gets auto-defined if none
+        'site-title'    : String,  // Custom site title, gets auto-defined if none
+        'use'           : 'Mixed', // Additional information for "type", variates
+    });
+});
+```
+
+## Using images
+
+You can add an API key to the property ``filepicker`` in your configuration and use the meteor package "filepicker",
+to handle images in your collections.
+
+To actually define an "image" field, use a custom schema definition as following:
+
+```javascript
+'image' : {
+    'type' : String,
+    'regEx' : SchemaRegEx.FilePickerImageUrl // the RegEx defined here defines the image field
+}
+```
+
+All your images are handled through the collection view and the uploading by the filepicker service.
 
 ## Possible configurations
 
