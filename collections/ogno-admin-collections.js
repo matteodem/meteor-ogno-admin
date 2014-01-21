@@ -157,8 +157,7 @@
 
         documentForm = new AutoForm(getCollection().simpleSchema());
 
-        // Init filepicker if a key was given
-        if ("string" === typeof config.filepicker) {
+        if ("string" === typeof config.filepicker && _.isObject(filepicker)) {
             filepicker.setKey(config.filepicker);
         }
     };
