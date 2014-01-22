@@ -106,7 +106,7 @@ To actually define an "image" field, use a custom definition in your Collection2
 
 All your images are handled through the collection view and the uploading by the filepicker service.
 
-## Possible configurations
+## Configuration
 
 You can configurate quite some options, but you don't have to (Client and Server):
 ```javascript
