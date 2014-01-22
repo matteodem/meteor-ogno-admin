@@ -31,3 +31,9 @@ Package.on_use(function (api, where) {
 
     api.export('OgnoAdmin');
 });
+
+Package.on_test(function (api, where) {
+    api.use(['tinytest', 'ogno-admin']);
+
+    api.add_files(['ogno-admin-tests.js'], ['client', 'server']);
+});
