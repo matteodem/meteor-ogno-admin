@@ -76,14 +76,14 @@ The ``tree`` is only useable on the root menu elements. Use weight to define the
 ```javascript
 Meteor.startup(function () {
     OgnoAdmin.structure({
+        'menu-title'    : String,  // Menu title (required)
+        'type'          : String,  // View type, currently "collection" or "custom" (required)
+        'use'           : 'Mixed', // Additional information for "type", variates (required)
         'tree'          : Array,   // Define sub elements, only possible on root
         'weight'        : Number,  // Sort order for all menu elements / views
-        'type'          : String,  // View type, currently "collection" or "custom"
         'slug'          : String,  // Custom url slug, gets auto-defined if none
         'icon'          : String,  // UI Menu Icons: http://semantic-ui.com/elements/icon.html
-        'menu-title'    : String,  // The Menu title, gets auto-defined if none
-        'site-title'    : String,  // Custom site title, gets auto-defined if none
-        'use'           : 'Mixed', // Additional information for "type", variates
+        'site-title'    : String   // Custom site title, gets auto-defined if none
     });
 });
 ```
