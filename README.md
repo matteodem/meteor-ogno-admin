@@ -118,3 +118,7 @@ OgnoAdmin.config({
     prefix              : String    // default: '/ogno-admin'
 });
 ```
+
+
+## Examples
+This project uses the ogno-admin for demonstration purposes https://github.com/matteodem/meteor-ogno-admin-example.
