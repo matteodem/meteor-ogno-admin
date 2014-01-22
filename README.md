@@ -82,7 +82,7 @@ Meteor.startup(function () {
         'tree'          : Array,   // Define sub elements, only possible on root
         'weight'        : Number,  // Sort order for all menu elements / views
         'slug'          : String,  // Custom url slug, gets auto-defined if none
-        'icon'          : String,  // UI Menu Icons: http://semantic-ui.com/elements/icon.html
+        'icon'          : String,  // http://semantic-ui.com/elements/icon.html
         'site-title'    : String   // Custom site title, gets auto-defined if none
     });
 });
@@ -93,13 +93,15 @@ Meteor.startup(function () {
 You can add an API key to the property ``filepicker`` in your configuration and use the meteor package "filepicker",
 to handle images in your collections.
 
-To actually define an "image" field, use a custom schema definition as following:
+To actually define an "image" field, use a custom definition in your Collection2 simple schema. 
 
 ```javascript
+...
 'image' : {
     'type' : String,
     'regEx' : SchemaRegEx.FilePickerImageUrl // the RegEx defined here defines the image field
 }
+...
 ```
 
 All your images are handled through the collection view and the uploading by the filepicker service.
