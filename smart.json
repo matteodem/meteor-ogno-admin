@@ -3,7 +3,7 @@
   "description": "Extendable, zero-config admin UI for Meteor",
   "homepage": "https://github.com/matteodem/meteor-ogno-admin",
   "author": "Matteo De Micheli",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "git": "https://github.com/matteodem/meteor-ogno-admin.git",
   "packages": {
     "autoform" : {},

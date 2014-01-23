@@ -134,7 +134,7 @@ And the javascript looks like:
 ```javascript
 Meteor.startup(function () {
     OgnoAdmin.structure({
-        'menu-title'    : 'Custm view',
+        'menu-title'    : 'Custom view',
         'type'          : 'custom',
         'use'           : 'customTemplate'
     });
