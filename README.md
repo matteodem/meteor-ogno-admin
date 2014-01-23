@@ -88,6 +88,59 @@ Meteor.startup(function () {
 });
 ```
 
+## View types
+## Collection
+To get a basic CRUD view for a specified collection define one of your elements like following.
+```javascript
+Meteor.startup(function () {
+    OgnoAdmin.structure({
+        'menu-title'    : 'Cars',
+        'type'          : 'collection',
+        'use'           : instanceof Meteor.Collection2
+    });
+
+    // or
+
+    OgnoAdmin.structure({
+        'menu-title'    : 'Cars 2',
+        'type'          : 'collection',
+        'use'           : {
+            'schema'    : {
+                ... /* Simple Schema */
+            },
+            'collection' : instanceof Meteor.Collection
+        }
+    });
+
+    // or, but is currently flaky
+
+    OgnoAdmin.structure({
+        'menu-title'    : 'Cars 3',
+        'type'          : 'collection',
+        'use'           : instanceof Meteor.Collection
+    });
+});
+```
+
+## Custom
+
+To render a custom Meteor template, use as followed.
+```html
+<template name="customTemplate">
+...
+</template>
+```
+And the javascript looks like:
+```javascript
+Meteor.startup(function () {
+    OgnoAdmin.structure({
+        'menu-title'    : 'Custm view',
+        'type'          : 'custom',
+        'use'           : 'customTemplate'
+    });
+});
+```
+
 ## Using images
 
 You can add an API key to the property ``filepicker`` in your configuration and use the meteor package "filepicker",

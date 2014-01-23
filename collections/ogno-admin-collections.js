@@ -111,7 +111,7 @@
             return _.isObject(config) ? insertAt(_.keys(config), 0, '_id') : [];
         },
         'needsSchema' : function () {
-            return _.isEmpty(getCollection().simpleSchema()._schema);
+            return _.isEmpty(OgnoAdmin.getSchema(getCollection()));
         },
         'value' : function (doc) {
             var array = [],
@@ -214,7 +214,7 @@
             return getCollection().findOne(Session.get('selectedDocument'));
         },
         'formField' : function () {
-            var schema = getCollection().simpleSchema()._schema;
+            var schema = OgnoAdmin.getSchema(getCollection());
 
             if (_.isObject(schema)) {
                 return _.map(schema, function (value, key) {

@@ -337,6 +337,21 @@ OgnoAdmin = (function () {
             return collections[p] ? collections[p] : {};
         },
         /**
+         * Returns a simple schema to a specified collection.
+         *
+         * @param {Object} c
+         * @returns Object
+         */
+        'getSchema' : function (c) {
+            var schema = c.simpleSchema()._schema;
+
+            if (!schema) {
+                return fakeSimpleSchema(c.findOne());
+            }
+
+            return schema;
+        },
+        /**
          * Helpers object to test them.
          */
         '_helpers' : {
