@@ -7,6 +7,8 @@ the create / edit forms with [autoform](https://github.com/aldeed/meteor-autofor
 [iron-router](https://github.com/EventedMind/iron-router) and the html, css is enhanced with
 [semantic-ui](https://github.com/nooitaf/meteor-semantic-ui).
 
+Here's a demo running on the meteor servers: [ogno-admin.meteor.com](http://ogno-admin.meteor.com)
+
 ## Quick Intro
 ```javascript
 // Client and Server
