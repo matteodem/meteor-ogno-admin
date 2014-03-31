@@ -62,12 +62,12 @@
             <!-- Use easy-template later -->
             {{#each formField}}
             <div class="field">
-                {{#if afFieldIsInvalid field autoform=../this}}
+                {{#if afFieldIsInvalid name=field autoform=..}}
                     <div class="ui error message">
-                        {{afFieldMessage field autoform=../../this}}
+                        {{> afFieldMessage name=field autoform=../..}}
                     </div>
                 {{/if}}
-                <label>{{afFieldLabel field autoform=../this}}</label>
+                <label>{{> afFieldLabel name=field autoform=..}}</label>
 
                 {{! Use normal autoform inputs or custom input fields }}
                 {{#if isImageField}}
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                 {{else}}
-                    {{afFieldInput field autoform=../../this options=ognoAdminOptions class=additionalClasses }}
+                    {{> afFieldInput name=field options=ognoAdminOptions class=additionalClasses }}
                 {{/if}}
             </div>
             {{/each}}

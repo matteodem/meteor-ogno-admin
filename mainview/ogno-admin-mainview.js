@@ -21,6 +21,6 @@ Template.ognoAdminMainView.helpers({
             return '<h1 class="ui large red inverted header">Didn\'t find your template specified: ' + view.type.view + '</h1>';
         }
 
-        return Template[view.type.view]();
+        return Template[view.type.view];
     }
 });

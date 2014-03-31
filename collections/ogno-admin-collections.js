@@ -8,8 +8,14 @@
      * @returns {Object}
      */
     function getCollection() {
-        var c = OgnoAdmin.getCollection(Session.get('ognoAdminCurrentView').type.reference);
-        return "object" === typeof c ? c : {};
+        var c,
+            v = Session.get('ognoAdminCurrentView');
+
+        if (v && v.type && v.type.reference) {
+            c = OgnoAdmin.getCollection(v.type.reference);
+        }
+
+        return "object" === typeof c ? c : { 'simpleSchema' : function () {} };
     }
 
     /**
@@ -18,7 +24,11 @@
      * @returns {Object}
      */
     function getConfig() {
-        return Session.get('ognoAdminCurrentView').config;
+        var v = Session.get('ognoAdminCurrentView');
+
+        if (v) {
+            return v.config;
+        }
     }
 
     /**
@@ -71,7 +81,7 @@
     Handlebars.registerHelper('ognoAdminOptions', function () {
         var that = this;
 
-        if (_.isObject(this.value.ognoAdmin)) {
+        if (_.isObject(this.value.ognoAdmin) && _.isObject(this.value.ognoAdmin.references)) {
             return _.map(this.value.ognoAdmin.references.find().fetch(), function (doc) {
                 var field = doc[that.value.ognoAdmin.field];
 
@@ -87,6 +97,15 @@
     /* -------------
       Collection View
       -------------- */
+
+    // Whenever the collection view gets changed
+    Deps.autorun(function () {
+        var currentView = Session.get('ognoAdminCurrentView');
+
+        if (currentView && currentView.type && currentView.type.reference) {
+            documentForm = getCollection().simpleSchema();
+        }
+    });
 
     // Helpers
     Template.ognoAdminCollectionsView.helpers({
@@ -116,6 +135,10 @@
         'value' : function (doc) {
             var array = [],
                 config = getConfig();
+
+            if (!config) {
+                return array;
+            }
 
             _.each(insertAt(_.keys(config), 0, '_id'), function (val) {
                 array.push(printValue(doc[val], config[val]));
@@ -155,30 +178,13 @@
     Template.ognoAdminEditForm.created = function () {
         var config = OgnoAdmin.config();
 
-        documentForm = new AutoForm(getCollection().simpleSchema());
+        documentForm = getCollection().simpleSchema();
 
         if ("string" === typeof config.filepicker && "object" === typeof filepicker) {
             filepicker.setKey(config.filepicker);
         }
-    };
 
-    // Rendered
-    Template.ognoAdminEditForm.rendered = function () {
-        var arrayInputs = $('select.arrayInput');
-
-        // TODO: Why the ".$" attributes ?
-        $('#ognoAdminEditForm .normalInput[name*=".$"]').parent().hide();
-
-        if (_.isFunction(arrayInputs.select2)) {
-            arrayInputs.select2({
-                'width' : 200
-            });
-        }
-
-        // Init autoform
-        documentForm = new AutoForm(getCollection().simpleSchema());
-
-        documentForm.hooks({
+        AutoForm.addHooks(null, {
             'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
                 var cb = function (err) {
                     if (!err) {
@@ -200,6 +206,20 @@
                 Session.set('uploadedDocument', null);
             }
         });
+    };
+
+    // Rendered
+    Template.ognoAdminEditForm.rendered = function () {
+        var arrayInputs = $('select.arrayInput');
+
+        // TODO: Why the ".$" attributes ?
+        $('#ognoAdminEditForm .normalInput[name*=".$"]').parent().hide();
+
+        if (_.isFunction(arrayInputs.select2)) {
+            arrayInputs.select2({
+                'width' : 200
+            });
+        }
     };
 
     // Helpers

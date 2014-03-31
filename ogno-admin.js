@@ -213,7 +213,7 @@ OgnoAdmin = (function () {
                     'layoutTemplate' : 'ognoAdminLayout',
                     'template' : 'ognoAdminMainView',
                     'path' : config.prefix + path,
-                    'load' : function () {
+                    'onRun' : function () {
                         Session.set('selectedDocument', null);
                         Session.set('ognoAdminCurrentView', null);
                     },
@@ -251,7 +251,7 @@ OgnoAdmin = (function () {
                 return config.homeScreenTemplate;
             },
             'customHomeScreenContent' : function () {
-                return Template[config.homeScreenTemplate]();
+                return Template[config.homeScreenTemplate];
             }
         });
 

@@ -3,12 +3,19 @@
     <div id="ognoAdminMenu" class="ui tiered fixed inverted vertical main menu">
         <div class="menu">
             {{#each mainItem}}
-            <{{tag}} href="{{url}}" class="{{isActive}} header main item">
-                <i class="{{icon}} icon"></i>
-                {{menu-title}}
-            </{{tag}}>
+                {{#if isLink}}
+                    <a href="{{url}}" class="{{isActive}} header main item">
+                        <i class="{{icon}} icon"></i>
+                        {{title}}
+                    </a>
+                {{else}}
+                    <div class="{{isActive}} header main item">
+                        <i class="{{icon}} icon"></i>
+                        {{title}}
+                    </div>
+                {{/if}}
                 {{#each subItem}}
-                <a href="{{subUrl}}" class="{{isActive ../this}} item">{{menu-title}}</a>
+                <a href="{{subUrl}}" class="{{isActive ..}} item">{{title}}</a>
                 {{/each}}
             {{/each}}
         </div>

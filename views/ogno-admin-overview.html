@@ -1,7 +1,7 @@
 <template name="ognoAdminOverview">
     {{#if canView}}
         {{#if customizedHomeScreen}}
-            {{{customHomeScreenContent}}}
+            {{> customHomeScreenContent}}
         {{else}}
         <h1 class="ui large header">Welcome to Ogno Admin</h1>
         <p>This admin UI has been made with lots of love and tries to make creating Admin Interfaces as easy as possible.</p>

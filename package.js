@@ -26,7 +26,7 @@ Package.on_use(function (api, where) {
 
     api.use(
         ['less', 'underscore', 'accounts-base', 'templating', 'livedata', 'mongo-livedata', 'jquery', 'iron-router',
-            'semantic-ui', 'session', 'pagination-mini', 'autoform', 'simple-schema', 'handlebars', 'check']
+            'semantic-ui', 'session', 'pagination-mini', 'autoform', 'simple-schema', 'handlebars', 'check', 'deps']
     );
 
     api.export('OgnoAdmin');

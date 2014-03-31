@@ -13,7 +13,7 @@ Template.ognoAdminMenu.helpers({
         isActive = this.slug === currentParams.id;
 
         // If there's a parent slug and also current parameters have it
-        if (parent.slug && currentParams.pid) {
+        if (parent && parent.slug && currentParams.pid) {
             parentIsActive = currentParams.pid === parent.slug;
         } else if (currentParams.pid) {
             // if there's no parent on current menu entry
@@ -23,8 +23,11 @@ Template.ognoAdminMenu.helpers({
 
         return isActive && parentIsActive ? 'active' : 'not-active';
     },
-    'tag' : function () {
-        return this['no-link'] || _.isArray(this.type) ? 'div' : 'a';
+    'title' : function () {
+        return this['menu-title'];
+    },
+    'isLink' : function () {
+        return !(this['no-link'] || _.isArray(this.type));
     },
     'url' : function () {
         return Router.routes['ognoAdminMainPage'].path({ 'id' : this.slug });
