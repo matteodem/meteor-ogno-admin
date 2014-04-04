@@ -78,7 +78,7 @@
         return array;
     }
 
-    Handlebars.registerHelper('ognoAdminOptions', function () {
+    Template.ognoAdminEditForm.ognoAdminOptions = function () {
         var that = this;
 
         if (_.isObject(this.value.ognoAdmin) && _.isObject(this.value.ognoAdmin.references)) {
@@ -92,7 +92,7 @@
         }
 
         return false;
-    });
+    };
 
     /* -------------
       Collection View
@@ -100,10 +100,17 @@
 
     // Whenever the collection view gets changed
     Deps.autorun(function () {
-        var currentView = Session.get('ognoAdminCurrentView');
+        var collection,
+            currentView = Session.get('ognoAdminCurrentView');
 
         if (currentView && currentView.type && currentView.type.reference) {
-            documentForm = getCollection().simpleSchema();
+            collection = getCollection();
+
+            if (!_.isFunction(collection.simpleSchema)) {
+                return;
+            }
+
+            documentForm = collection.simpleSchema();
         }
     });
 
@@ -157,10 +164,12 @@
     Template.ognoAdminMainView.events({
         'click .edit-document' : function (e) {
             Session.set('selectedDocument', $(e.target).attr('collection-id'));
+            $('#ognoAdminEditForm .save').prop("disabled", false);
             $('.page.dimmer').dimmer('show');
         },
         'click .add-document' : function () {
             Session.set('selectedDocument', 'new');
+            $('#ognoAdminEditForm .save').prop("disabled", false);
             $('.page.dimmer').dimmer('show');
         }
     });
@@ -183,8 +192,22 @@
         if ("string" === typeof config.filepicker && "object" === typeof filepicker) {
             filepicker.setKey(config.filepicker);
         }
+    };
 
-        AutoForm.addHooks(null, {
+    // Rendered
+    Template.ognoAdminEditForm.rendered = function () {
+        var arrayInputs = $('select.arrayInput');
+
+        // TODO: Why the ".$" attributes ?
+        $('#ognoAdminEditForm .normalInput[name*=".$"]').parent().hide();
+
+        if (_.isFunction(arrayInputs.select2)) {
+            arrayInputs.select2({
+                'width' : 200
+            });
+        }
+
+        AutoForm.addHooks('ognoAdminEditForm', {
             'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
                 var cb = function (err) {
                     if (!err) {
@@ -206,20 +229,6 @@
                 Session.set('uploadedDocument', null);
             }
         });
-    };
-
-    // Rendered
-    Template.ognoAdminEditForm.rendered = function () {
-        var arrayInputs = $('select.arrayInput');
-
-        // TODO: Why the ".$" attributes ?
-        $('#ognoAdminEditForm .normalInput[name*=".$"]').parent().hide();
-
-        if (_.isFunction(arrayInputs.select2)) {
-            arrayInputs.select2({
-                'width' : 200
-            });
-        }
     };
 
     // Helpers
