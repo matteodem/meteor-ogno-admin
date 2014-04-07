@@ -1,6 +1,5 @@
 (function () {
-    var pagination,
-        documentForm;
+    var pagination;
 
     /**
      * Returns the current selected collection with help of the Session object.
@@ -109,8 +108,6 @@
             if (!_.isFunction(collection.simpleSchema)) {
                 return;
             }
-
-            documentForm = collection.simpleSchema();
         }
     });
 
@@ -164,12 +161,10 @@
     Template.ognoAdminMainView.events({
         'click .edit-document' : function (e) {
             Session.set('selectedDocument', $(e.target).attr('collection-id'));
-            $('#ognoAdminEditForm .save').prop("disabled", false);
             $('.page.dimmer').dimmer('show');
         },
         'click .add-document' : function () {
             Session.set('selectedDocument', 'new');
-            $('#ognoAdminEditForm .save').prop("disabled", false);
             $('.page.dimmer').dimmer('show');
         }
     });
@@ -187,12 +182,33 @@
     Template.ognoAdminEditForm.created = function () {
         var config = OgnoAdmin.config();
 
-        documentForm = getCollection().simpleSchema();
-
         if ("string" === typeof config.filepicker && "object" === typeof filepicker) {
             filepicker.setKey(config.filepicker);
         }
     };
+
+    AutoForm.addHooks('ognoAdminEditForm', {
+        'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
+            var cb = function (err) {
+                if (!err) {
+                    $('.page.dimmer').dimmer('hide');
+                }
+            };
+
+            insertDoc = getImageValues(insertDoc);
+
+            if (currentDoc) {
+                getCollection().update(currentDoc._id, { $set : insertDoc }, cb);
+                return;
+            }
+
+            getCollection().insert(insertDoc, cb);
+
+            this.resetForm();
+            Session.set('selectedDocument', null);
+            Session.set('uploadedDocument', null);
+        }
+    });
 
     // Rendered
     Template.ognoAdminEditForm.rendered = function () {
@@ -206,29 +222,6 @@
                 'width' : 200
             });
         }
-
-        AutoForm.addHooks('ognoAdminEditForm', {
-            'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
-                var cb = function (err) {
-                    if (!err) {
-                        $('.page.dimmer').dimmer('hide');
-                    }
-                };
-
-                insertDoc = getImageValues(insertDoc);
-
-                if (currentDoc) {
-                    getCollection().update(currentDoc._id, { $set : insertDoc }, cb);
-                    return;
-                }
-
-                getCollection().insert(insertDoc, cb);
-
-                this.resetForm();
-                Session.set('selectedDocument', null);
-                Session.set('uploadedDocument', null);
-            }
-        });
     };
 
     // Helpers
@@ -236,8 +229,8 @@
         'editMode' : function () {
             return Session.get('selectedDocument');
         },
-        'documentForm' : function () {
-            return documentForm;
+        'collectionForForm' : function () {
+            return getCollection();
         },
         'selectedDoc' : function () {
             return getCollection().findOne(Session.get('selectedDocument'));

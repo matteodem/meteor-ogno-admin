@@ -57,7 +57,7 @@
 <template name="ognoAdminEditForm">
     <h1>{{siteTitle}} {{operation}} Form <button class="ui icon inverted basic button"><i class="close dimmer icon"></i></button></h1>
     {{#if editMode}}
-        {{#autoForm schema=documentForm doc=selectedDoc id="ognoAdminEditForm"}}
+        {{#autoForm collection=collectionForForm doc=selectedDoc id="ognoAdminEditForm" type=operationClass}}
         <div class="ui form">
             <!-- Use easy-template later -->
             {{#each formField}}
@@ -83,9 +83,9 @@
                 {{/if}}
             </div>
             {{/each}}
-            <button type="submit" class="ui save {{operationClass}} positive button">Save</button>
+            <button type="submit" class="ui save positive button">Save</button>
             {{#if isNotNew}}
-            <button type="submit" class="ui {{removeClass}} removable red button">{{removeText}}</button>
+            <button class="ui {{removeClass}} removable red button">{{removeText}}</button>
             {{/if}}
         </div>
         {{/autoForm}}
