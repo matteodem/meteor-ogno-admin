@@ -47,7 +47,12 @@ OgnoAdmin = (function () {
             schema = fakeSimpleSchema(collection.findOne());
         }
 
-        // fake simpleSchema method
+        // Add a simple schema to the collection if has function
+        if (_.isFunction(collection.attachSchema)) {
+            collection.attachSchema(new SimpleSchema(schema));
+            return collection;
+        }
+
         collection.simpleSchema = function () {
             return new SimpleSchema(schema);
         };
@@ -87,6 +92,37 @@ OgnoAdmin = (function () {
     }
 
     /**
+     * Returns an ogno-admin readable config object of a simple schema.
+     *
+     * @param {Object} schema
+     * @return {Object}
+     */
+    function getOgnoAdminConfigFromSchema(schema) {
+        var config = {};
+
+        _.each(schema, function (value, key) {
+            var fieldName,
+                collectionName;
+
+            if (key.indexOf('.$') > -1) {
+                return;
+            }
+
+            if (_.isObject(value.ognoAdmin) && _.isObject(value.ognoAdmin.references)) {
+                collectionName = value.ognoAdmin.references._name;
+                fieldName = value.ognoAdmin.field ? value.ognoAdmin.field : '_id';
+            }
+
+            config[key] = {
+                type : value.type.toString().match(/[A-Z][\w]+()/g).shift().toLowerCase(),
+                references : collectionName,
+                field : fieldName
+            };
+        });
+
+        return config;
+    }
+    /**
      * Returns a fully converted structure, useable by ogno-admin.
      *
      * @param {Object}  s       the new Structure
@@ -123,30 +159,12 @@ OgnoAdmin = (function () {
                     collection = addSimpleSchemaToCollection(collection, schema);
                 }
 
-                collections[e.use._name] = collection;
-                e.type = { 'view' : 'collections', 'reference' :  e.use._name };
+                collections[collection._name] = collection;
+                e.type = { 'view' : 'collections', 'reference' : collection._name };
 
-                _.each(collection.simpleSchema()._schema, function (value, key) {
-                    var fieldName,
-                        collectionName;
-
-                    if (key.indexOf('.$') > -1) {
-                        return;
-                    }
-
-                    if (_.isObject(value.ognoAdmin) && _.isObject(value.ognoAdmin.references)) {
-                        collectionName = value.ognoAdmin.references._name;
-                        fieldName = value.ognoAdmin.field ? value.ognoAdmin.field : '_id';
-                    }
-
-                    sessionConfig[key] = {
-                        type : value.type.toString().match(/[A-Z][\w]+()/g).shift().toLowerCase(),
-                        references : collectionName,
-                        field : fieldName
-                    };
-                });
-
-                e.config = sessionConfig;
+                e.config = getOgnoAdminConfigFromSchema(
+                  collection.simpleSchema()._schema
+                );
             } else if ("custom" === e.type) {
                 // is a custom template
                 e.type = { 'view' : e.use };
@@ -345,7 +363,7 @@ OgnoAdmin = (function () {
         'getSchema' : function (c) {
             var schema = c.simpleSchema()._schema;
 
-            if (!schema) {
+            if (_.size(schema) === 0) {
                 return fakeSimpleSchema(c.findOne());
             }
 
@@ -357,7 +375,8 @@ OgnoAdmin = (function () {
         '_helpers' : {
             'slugify' : slugify,
             'prettify' : prettify,
-            'fakeSimpleSchema' : fakeSimpleSchema
+            'fakeSimpleSchema' : fakeSimpleSchema,
+            'getOgnoAdminConfigFromSchema' : getOgnoAdminConfigFromSchema
         }
     };
 })();

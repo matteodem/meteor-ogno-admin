@@ -18,19 +18,6 @@
     }
 
     /**
-     * Returns the current configuration for the view.
-     *
-     * @returns {Object}
-     */
-    function getConfig() {
-        var v = Session.get('ognoAdminCurrentView');
-
-        if (v) {
-            return v.config;
-        }
-    }
-
-    /**
      * Returns a valid html representation of the value.
      *
      * @param {*} val
@@ -75,6 +62,16 @@
     function insertAt(array, index, item) {
         array.splice(index, 0, item);
         return array;
+    }
+
+    /**
+     * Return a collection config for ogno-admin.
+     *
+     * return {Object}
+     */
+    function getCollectionConfig() {
+        var schema = OgnoAdmin.getSchema(getCollection());
+        return OgnoAdmin._helpers.getOgnoAdminConfigFromSchema(schema);
     }
 
     Template.ognoAdminEditForm.ognoAdminOptions = function () {
@@ -130,7 +127,7 @@
             return this._id === Session.get('selectedDocument') ? 'inverted teal active' : 'not-active';
         },
         'headerValue' : function () {
-            var config = getConfig();
+            var config = getCollectionConfig();
             return _.isObject(config) ? insertAt(_.keys(config), 0, '_id') : [];
         },
         'needsSchema' : function () {
@@ -138,7 +135,7 @@
         },
         'value' : function (doc) {
             var array = [],
-                config = getConfig();
+                config = getCollectionConfig();
 
             if (!config) {
                 return array;
@@ -188,25 +185,18 @@
     };
 
     AutoForm.addHooks('ognoAdminEditForm', {
-        'onSubmit' : function (insertDoc, updateDoc, currentDoc) {
-            var cb = function (err) {
-                if (!err) {
-                    $('.page.dimmer').dimmer('hide');
-                }
-            };
-
-            insertDoc = getImageValues(insertDoc);
-
-            if (currentDoc) {
-                getCollection().update(currentDoc._id, { $set : insertDoc }, cb);
-                return;
+        'before' : {
+            insert : function (doc) {
+                return getImageValues(doc);
+            },
+            update : function (docId, modifier) {
+                modifier['$set'] = getImageValues(modifier['$set']);
+                return modifier;
             }
-
-            getCollection().insert(insertDoc, cb);
-
-            this.resetForm();
-            Session.set('selectedDocument', null);
+        },
+        'onSuccess' : function (operation, result, template) {
             Session.set('uploadedDocument', null);
+            $('.page.dimmer').dimmer('hide');
         }
     });
 
@@ -227,10 +217,18 @@
     // Helpers
     Template.ognoAdminEditForm.helpers({
         'editMode' : function () {
+            Session.set('reallyRemove', false);
             return Session.get('selectedDocument');
         },
         'collectionForForm' : function () {
-            return getCollection();
+            var collection = getCollection(),
+                schema = collection.simpleSchema();
+
+            if (0 === _.size(schema._schema)) {
+                collection.attachSchema(OgnoAdmin.getSchema(collection));
+            }
+
+            return collection;
         },
         'selectedDoc' : function () {
             return getCollection().findOne(Session.get('selectedDocument'));
@@ -294,7 +292,6 @@
                 getCollection().remove(Session.get('selectedDocument'));
                 Session.set('reallyRemove', false);
                 Session.set('selectedDocument', null);
-                $('.page.dimmer').dimmer('hide');
 
                 return;
             }
@@ -314,7 +311,7 @@
         'submit #ognoAdminEditForm' : function (e) {
             e.preventDefault();
         },
-        'click .close.dimmer' : function (e) {
+        'click .close-dimmer' : function (e) {
             $('.page.dimmer').dimmer('hide');
         }
     });

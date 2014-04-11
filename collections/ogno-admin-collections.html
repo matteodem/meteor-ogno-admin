@@ -55,7 +55,7 @@
 </template>
 
 <template name="ognoAdminEditForm">
-    <h1>{{siteTitle}} {{operation}} Form <button class="ui icon inverted basic button"><i class="close dimmer icon"></i></button></h1>
+    <h1>{{siteTitle}} {{operation}} Form <button class="ui icon inverted close-dimmer basic button"><i class="close dimmer icon"></i></button></h1>
     {{#if editMode}}
         {{#autoForm collection=collectionForForm doc=selectedDoc id="ognoAdminEditForm" type=operationClass}}
         <div class="ui form">
