@@ -361,7 +361,14 @@ OgnoAdmin = (function () {
          * @returns Object
          */
         'getSchema' : function (c) {
-            var schema = c.simpleSchema()._schema;
+            var schema = [],
+                schemaObj = c.simpleSchema();
+
+            if (!_.isObject(schemaObj)) {
+                return schema;
+            }
+
+            schema = schemaObj._schema;
 
             if (_.size(schema) === 0) {
                 return fakeSimpleSchema(c.findOne());
