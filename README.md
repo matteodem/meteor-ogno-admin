@@ -114,7 +114,7 @@ Meteor.startup(function () {
         }
     });
 
-    // or, but is currently flaky
+    // or
 
     OgnoAdmin.structure({
         'menu-title'    : 'Cars 3',
@@ -148,7 +148,7 @@ Meteor.startup(function () {
 You can add an API key to the property ``filepicker`` in your configuration and use the meteor package "filepicker",
 to handle images in your collections.
 
-To actually define an "image" field, use a custom definition in your Collection2 simple schema. 
+To actually define an "image" field, use a custom definition in your Collection2 simple schema.
 
 ```javascript
 ...
