@@ -274,7 +274,7 @@ OgnoAdmin = (function () {
             'customizedGuestHomeScreen' : function () {
                 return config.homeScreenTemplateGuest;
             },
-            'customizedGuestHomeScreenContent' : function () {
+            'customGuestHomeScreenContent' : function () {
                 return Template[config.homeScreenTemplateGuest];
             }
         });
