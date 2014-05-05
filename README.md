@@ -166,11 +166,12 @@ All your images are handled through the collection view and the uploading by the
 You can configurate quite some options, but you don't have to (Client and Server):
 ```javascript
 OgnoAdmin.config({
-    auto                : Boolean,  // default: false,
-    filepicker          : String,   // default: ''
-    homeScreenTemplate  : String,   // default: 'ognoAdminOverview'
-    isAllowed           : Function, // default: return Meteor.user()
-    prefix              : String    // default: '/ogno-admin'
+    auto                    : Boolean,  // default: false,
+    filepicker              : String,   // default: ''
+    homeScreenTemplate      : String,   // default: none. Changes the template for the Dashboard when logged in.
+    homeScreenTemplateGuest : String,   // default: none. Changes the template for '/admin' in place of the default text/notice 'Not Enough Permissions.'
+    isAllowed               : Function, // default: return Meteor.user()
+    prefix                  : String    // default: '/ogno-admin'
 });
 ```
 
