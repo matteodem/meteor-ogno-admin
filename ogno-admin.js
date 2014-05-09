@@ -11,6 +11,9 @@ OgnoAdmin = (function () {
             'prefix' : '/ogno-admin',
             'isAllowed' : function () {
                 return Meteor.user();
+            },
+            'waitOn' : function () {
+              return null;
             }
         };
 
@@ -235,6 +238,9 @@ OgnoAdmin = (function () {
                         Session.set('selectedDocument', null);
                         Session.set('ognoAdminCurrentView', null);
                     },
+                    'waitOn' : function () {
+                      return config.waitOn();;
+                    },
                     'data' : function () {
                         var data = {},
                             s = getSectorOfStructureWithParameters(this.params);
@@ -260,13 +266,12 @@ OgnoAdmin = (function () {
             return;
         }
 
-        Handlebars.registerHelper('canView', function () {
-            return OgnoAdmin.isAllowed();
-        });
-
         Template.ognoAdminOverview.helpers({
+            'canView' : function () {
+                return OgnoAdmin.isAllowed();
+            },
             'customizedHomeScreen' : function () {
-                return config.homeScreenTemplate;
+                return Template[config.homeScreenTemplate];
             },
             'customHomeScreenContent' : function () {
                 return Template[config.homeScreenTemplate];
