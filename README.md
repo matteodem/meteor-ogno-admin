@@ -85,7 +85,8 @@ Meteor.startup(function () {
         'weight'        : Number,  // Sort order for all menu elements / views
         'slug'          : String,  // Custom url slug, gets auto-defined if none
         'icon'          : String,  // http://semantic-ui.com/elements/icon.html
-        'site-title'    : String   // Custom site title, gets auto-defined if none
+        'site-title'    : String,  // Custom site title, gets auto-defined if none
+        'waitOn'        : Function // waitOn property used for the iron-routes
     });
 });
 ```
